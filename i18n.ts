@@ -13,6 +13,9 @@ const resources = {
       day: "Day",
       week: "Week",
       month: "Month",
+      filterByResponsible: "Filter by Responsible",
+      filterByProject: "Filter by Project ID",
+      all: "All",
       // KanbanBoard.tsx
       responsible: "Responsible",
       unassigned: "Unassigned",
@@ -28,6 +31,9 @@ const resources = {
       day: "Dia",
       week: "Semana",
       month: "Mês",
+      filterByResponsible: "Filtrar por Responsável",
+      filterByProject: "Filtrar por Projeto",
+      all: "Todos",
       // KanbanBoard.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",
