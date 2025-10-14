@@ -1,8 +1,7 @@
-
 import type { ViewLevel, DateColumn } from '../types';
 
 // Helper to get the start of the day (00:00:00)
-const getStartOfDay = (date: Date): Date => {
+export const getStartOfDay = (date: Date): Date => {
     const d = new Date(date);
     d.setHours(0, 0, 0, 0);
     return d;
@@ -46,7 +45,7 @@ export const getDaysInMonth = (date: Date): number => {
 };
 
 
-export const generateDateColumns = (viewLevel: ViewLevel, currentDate: Date): DateColumn[] => {
+export const generateDateColumns = (viewLevel: ViewLevel, currentDate: Date, locale: string): DateColumn[] => {
     const columns: DateColumn[] = [];
     
     switch (viewLevel) {
@@ -57,7 +56,7 @@ export const generateDateColumns = (viewLevel: ViewLevel, currentDate: Date): Da
                 columns.push({
                     startDate: day,
                     endDate: day,
-                    label: day.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })
+                    label: day.toLocaleDateString(locale, { weekday: 'short', day: 'numeric' })
                 });
             }
             break;
@@ -91,7 +90,7 @@ export const generateDateColumns = (viewLevel: ViewLevel, currentDate: Date): Da
                 columns.push({
                     startDate: monthDate,
                     endDate: endOfMonth,
-                    label: monthDate.toLocaleDateString('en-US', { month: 'long' })
+                    label: monthDate.toLocaleDateString(locale, { month: 'long' })
                 });
             }
             break;
@@ -100,16 +99,16 @@ export const generateDateColumns = (viewLevel: ViewLevel, currentDate: Date): Da
     return columns;
 };
 
-export const getFormattedDateRange = (viewLevel: ViewLevel, currentDate: Date): string => {
+export const getFormattedDateRange = (viewLevel: ViewLevel, currentDate: Date, locale: string): string => {
     switch (viewLevel) {
         case 'Day':
             const startOfWeek = getStartOfWeek(currentDate);
             const endOfWeek = addDays(startOfWeek, 4);
-            return `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+            return `${startOfWeek.toLocaleDateString(locale, { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })}`;
         case 'Week':
-            return currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            return currentDate.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
         case 'Month':
-            return currentDate.toLocaleDateString('en-US', { year: 'numeric' });
+            return currentDate.toLocaleDateString(locale, { year: 'numeric' });
         default:
             return '';
     }

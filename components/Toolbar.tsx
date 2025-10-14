@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ViewLevel } from '../types';
 import { addDays, addMonths, addYears, getFormattedDateRange } from '../utils/dateUtils';
 
@@ -19,6 +19,9 @@ const ChevronRightIcon = () => (
 
 
 export const Toolbar: React.FC<ToolbarProps> = ({ viewLevel, onViewLevelChange, currentDate, onCurrentDateChange }) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
+
   const handlePrev = () => {
     if (viewLevel === 'Day') onCurrentDateChange(addDays(currentDate, -7));
     if (viewLevel === 'Week') onCurrentDateChange(addMonths(currentDate, -1));
@@ -42,14 +45,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({ viewLevel, onViewLevelChange, 
           onClick={handleToday}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
-          Today
+          {t('today')}
         </button>
         <div className="flex items-center gap-1">
           <button onClick={handlePrev} className="p-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"><ChevronLeftIcon /></button>
           <button onClick={handleNext} className="p-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"><ChevronRightIcon /></button>
         </div>
         <div className="text-lg font-semibold text-gray-800 w-64 text-center">
-            {getFormattedDateRange(viewLevel, currentDate)}
+            {getFormattedDateRange(viewLevel, currentDate, locale)}
         </div>
       </div>
       
@@ -61,7 +64,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({ viewLevel, onViewLevelChange, 
             className={`px-4 py-2 text-sm font-medium border-l border-gray-300 first:border-l-0 rounded-md first:rounded-r-none last:rounded-l-none
               ${viewLevel === level ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-50'}`}
           >
-            {level}
+            {t(level.toLowerCase())}
           </button>
         ))}
       </div>
