@@ -11,9 +11,10 @@ interface KanbanBoardProps {
   teamMembers: TeamMember[];
   onTaskUpdate: (task: Task) => void;
   justUpdatedTaskId: string | null;
+  onTaskDoubleClick: (task: Task) => void;
 }
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate, tasks, teamMembers, onTaskUpdate, justUpdatedTaskId }) => {
+export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate, tasks, teamMembers, onTaskUpdate, justUpdatedTaskId, onTaskDoubleClick }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
   const dateColumns = generateDateColumns(viewLevel, currentDate, locale);
@@ -162,14 +163,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
   const timelineGridTemplateColumns = `repeat(${dateColumns.length}, minmax(120px, 2fr))`;
 
   return (
-    <div className="bg-[#2a2f32] rounded-lg overflow-hidden border border-[#40464a] flex h-full">
+    <div className="bg-[var(--color-surface-1)] rounded-lg overflow-hidden border border-[var(--color-surface-2)] flex h-full">
         {/* --- Left Column: Responsible --- */}
-        <div className="flex-shrink-0 z-10 border-r border-[#40464a]" style={{ width: '150px' }}>
-            <div className="p-3 font-semibold text-sm text-[#b0b3b8] bg-[#181c1e] border-b border-[#40464a] sticky top-0">
+        <div className="flex-shrink-0 z-10 border-r border-[var(--color-surface-2)]" style={{ width: '150px' }}>
+            <div className="p-3 font-semibold text-sm text-[var(--color-text-secondary)] bg-[var(--color-back)] border-b border-[var(--color-surface-2)] sticky top-0">
                 {t('responsible')}
             </div>
             {allMembers.map((member) => (
-                <div key={member.id} className="p-3 text-sm font-medium text-white bg-transparent border-b border-[#40464a] min-h-[80px] flex items-center">
+                <div key={member.id} className="p-3 text-sm font-medium text-[var(--color-text-primary)] bg-transparent border-b border-[var(--color-surface-2)] min-h-[80px] flex items-center">
                     {member.id === 'unassigned' ? t('unassigned') : member.name}
                 </div>
             ))}
@@ -186,7 +187,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
             >
                 {/* Date Headers */}
                 {dateColumns.map((col, index) => (
-                    <div key={index} className="p-3 text-center font-semibold text-sm text-[#b0b3b8] bg-[#181c1e] border-b border-r border-[#40464a] last:border-r-0 sticky top-0 z-20">
+                    <div key={index} className="p-3 text-center font-semibold text-sm text-[var(--color-text-secondary)] bg-[var(--color-back)] border-b border-r border-[var(--color-surface-2)] last:border-r-0 sticky top-0 z-20">
                         {col.label}
                     </div>
                 ))}
@@ -202,7 +203,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
                             <div
                                 key={colIndex}
                                 style={{ gridRow: rowIndex + 2, gridColumn: colIndex + 1 }}
-                                className="drop-cell border-b border-r border-[#40464a] last:border-r-0 min-h-[80px] transition-colors duration-150"
+                                className="drop-cell border-b border-r border-[var(--color-surface-2)] last:border-r-0 min-h-[80px] transition-colors duration-150"
                                 onDragOver={(e) => handleDragOver(e, rowIndex)}
                                 onDrop={(e) => handleDrop(e, colIndex)}
                             ></div>
@@ -241,7 +242,11 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
                                         onDragStart={isDraggable ? (e) => handleDragStart(e, task) : undefined}
                                         onDragEnd={isDraggable ? handleDragEnd : undefined}
                                     >
-                                        <TaskCard task={task} maxStack={layoutInfo?.maxStack ?? 1} />
+                                        <TaskCard 
+                                            task={task} 
+                                            maxStack={layoutInfo?.maxStack ?? 1}
+                                            onDoubleClick={onTaskDoubleClick} 
+                                        />
                                     </div>
                                 );
                             })}

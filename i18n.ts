@@ -8,6 +8,7 @@ const resources = {
       // App.tsx
       kanbanMatrix: "Kanban Matrix",
       teamActivityOverview: "Team Activity Overview",
+      setup: "Setup",
       // Toolbar.tsx
       today: "Today",
       day: "Day",
@@ -19,6 +20,19 @@ const resources = {
       // KanbanBoard.tsx
       responsible: "Responsible",
       unassigned: "Unassigned",
+      // SetupScreen.tsx
+      theme: "Theme",
+      language: "Language",
+      dark: "Dark",
+      light: "Light",
+      close: "Close",
+      // TaskDetailModal.tsx
+      taskDetails: "Task Details",
+      project: "Project",
+      title: "Title",
+      startDate: "Start Date",
+      endDate: "End Date",
+      hours: "Hours",
     }
   },
   pt: {
@@ -26,6 +40,7 @@ const resources = {
       // App.tsx
       kanbanMatrix: "Matriz Kanban",
       teamActivityOverview: "Visão Geral da Atividade da Equipe",
+      setup: "Configurações",
       // Toolbar.tsx
       today: "Hoje",
       day: "Dia",
@@ -37,6 +52,19 @@ const resources = {
       // KanbanBoard.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",
+      // SetupScreen.tsx
+      theme: "Tema",
+      language: "Idioma",
+      dark: "Escuro",
+      light: "Claro",
+      close: "Fechar",
+      // TaskDetailModal.tsx
+      taskDetails: "Detalhes da Tarefa",
+      project: "Projeto",
+      title: "Título",
+      startDate: "Data de Início",
+      endDate: "Data de Fim",
+      hours: "Horas",
     }
   }
 };
