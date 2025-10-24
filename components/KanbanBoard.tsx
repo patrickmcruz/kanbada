@@ -1,36 +1,36 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Task, TeamMember, ViewLevel } from '../types';
+import type { TaskWorkPackage, TeamMember, ViewLevel } from '../types';
 import { generateDateColumns, daysBetween, addDays, getStartOfDay } from '../utils/dateUtils';
-import { TaskCard } from './TaskCard';
+import { WorkPackageCard } from './WorkPackageCard';
 
 interface KanbanBoardProps {
   viewLevel: ViewLevel;
   currentDate: Date;
-  tasks: Task[];
+  workPackages: TaskWorkPackage[];
   teamMembers: TeamMember[];
-  onTaskUpdate: (task: Task) => void;
-  justUpdatedTaskId: string | null;
-  onTaskDoubleClick: (task: Task) => void;
+  onWorkPackageUpdate: (workPackage: TaskWorkPackage) => void;
+  justUpdatedWorkPackageId: string | null;
+  onWorkPackageDoubleClick: (workPackage: TaskWorkPackage) => void;
 }
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate, tasks, teamMembers, onTaskUpdate, justUpdatedTaskId, onTaskDoubleClick }) => {
+export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageUpdate, justUpdatedWorkPackageId, onWorkPackageDoubleClick }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
   const dateColumns = generateDateColumns(viewLevel, currentDate, locale);
   
-  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+  const [draggedWorkPackageId, setDraggedWorkPackageId] = useState<string | null>(null);
 
   const allMembers = useMemo(() => 
     [...teamMembers.filter(m => m.id !== 'unassigned'), ...teamMembers.filter(m => m.id === 'unassigned')],
     [teamMembers]
   );
 
-  const taskLayouts = useMemo(() => {
+  const workPackageLayouts = useMemo(() => {
     const layouts = new Map<string, { stackIndex: number; maxStack: number }>();
 
     allMembers.forEach(member => {
-        const memberTasks = tasks
+        const memberTasks = workPackages
             .filter(task => (task.ownerId ?? 'unassigned') === member.id)
             .sort((a, b) => {
                 const startDiff = a.startDate.getTime() - b.startDate.getTime();
@@ -75,14 +75,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
     });
 
     return layouts;
-  }, [tasks, allMembers]);
+  }, [workPackages, allMembers]);
 
-  const getTaskPosition = (task: Task) => {
+  const getWorkPackagePosition = (workPackage: TaskWorkPackage) => {
     const viewStartDate = dateColumns[0].startDate;
     const viewEndDate = dateColumns[dateColumns.length - 1].endDate;
 
-    const taskStartDateSOD = getStartOfDay(task.startDate);
-    const taskEndDateSOD = getStartOfDay(task.endDate);
+    const taskStartDateSOD = getStartOfDay(workPackage.startDate);
+    const taskEndDateSOD = getStartOfDay(workPackage.endDate);
     const viewStartDateSOD = getStartOfDay(viewStartDate);
     const viewEndDateSOD = getStartOfDay(viewEndDate);
 
@@ -123,23 +123,23 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
     };
   };
 
-  const handleDragStart = (e: React.DragEvent, task: Task) => {
-    e.dataTransfer.setData('taskId', task.id);
+  const handleDragStart = (e: React.DragEvent, workPackage: TaskWorkPackage) => {
+    e.dataTransfer.setData('workPackageId', workPackage.id);
     e.dataTransfer.effectAllowed = 'move';
     setTimeout(() => {
-        setDraggedTaskId(task.id);
+        setDraggedWorkPackageId(workPackage.id);
     }, 0);
   };
 
   const handleDragEnd = () => {
-    setDraggedTaskId(null);
+    setDraggedWorkPackageId(null);
   };
 
   const handleDragOver = (e: React.DragEvent, rowIndex: number) => {
-    if (!draggedTaskId) return;
-    const task = tasks.find(t => t.id === draggedTaskId);
-    if (!task) return;
-    const taskOwnerId = task.ownerId ?? 'unassigned';
+    if (!draggedWorkPackageId) return;
+    const workPackage = workPackages.find(t => t.id === draggedWorkPackageId);
+    if (!workPackage) return;
+    const taskOwnerId = workPackage.ownerId ?? 'unassigned';
     const dropRowOwnerId = allMembers[rowIndex].id;
     if (taskOwnerId === dropRowOwnerId) {
         e.preventDefault();
@@ -148,16 +148,16 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
   
   const handleDrop = (e: React.DragEvent, colIndex: number) => {
     e.preventDefault();
-    const taskId = e.dataTransfer.getData('taskId');
-    if (!taskId) return;
-    const originalTask = tasks.find(t => t.id === taskId);
-    if (!originalTask) return;
+    const workPackageId = e.dataTransfer.getData('workPackageId');
+    if (!workPackageId) return;
+    const originalWorkPackage = workPackages.find(t => t.id === workPackageId);
+    if (!originalWorkPackage) return;
     const targetColumn = dateColumns[colIndex];
-    const duration = daysBetween(originalTask.startDate, originalTask.endDate);
+    const duration = daysBetween(originalWorkPackage.startDate, originalWorkPackage.endDate);
     const newStartDate = targetColumn.startDate;
     const newEndDate = addDays(newStartDate, duration - 1);
-    const updatedTask: Task = { ...originalTask, startDate: newStartDate, endDate: newEndDate };
-    onTaskUpdate(updatedTask);
+    const updatedWorkPackage: TaskWorkPackage = { ...originalWorkPackage, startDate: newStartDate, endDate: newEndDate };
+    onWorkPackageUpdate(updatedWorkPackage);
   };
 
   const timelineGridTemplateColumns = `repeat(${dateColumns.length}, minmax(120px, 2fr))`;
@@ -177,7 +177,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
         </div>
 
         {/* --- Right Column: Timeline (scrollable) --- */}
-        <div className={`flex-1 overflow-auto ${draggedTaskId ? 'is-dragging' : ''}`}>
+        <div className={`flex-1 overflow-auto ${draggedWorkPackageId ? 'is-dragging' : ''}`}>
             <div
                 className="grid relative"
                 style={{
@@ -210,13 +210,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
                         ))}
 
                         {/* Tasks for this member */}
-                        {tasks
+                        {workPackages
                             .filter(task => (task.ownerId ?? 'unassigned') === member.id)
-                            .map((task) => {
-                                const position = getTaskPosition(task);
+                            .map((workPackage) => {
+                                const position = getWorkPackagePosition(workPackage);
                                 if (!position) return null;
                                 
-                                const layoutInfo = taskLayouts.get(task.id);
+                                const layoutInfo = workPackageLayouts.get(workPackage.id);
                                 const style: React.CSSProperties = { ...position, gridRow: rowIndex + 2 };
 
                                 if (layoutInfo && layoutInfo.maxStack > 1) {
@@ -230,22 +230,22 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
                                     style.zIndex = stackIndex;
                                 }
                                 
-                                const isDraggable = task.ownerId !== null;
-                                const wasJustUpdated = task.id === justUpdatedTaskId;
+                                const isDraggable = workPackage.ownerId !== null;
+                                const wasJustUpdated = workPackage.id === justUpdatedWorkPackageId;
 
                                 return (
                                     <div 
-                                        key={task.id} 
+                                        key={workPackage.id} 
                                         style={style} 
-                                        className={`p-1 z-10 transition-all duration-300 ease-in-out ${isDraggable ? 'cursor-grab' : ''} ${draggedTaskId === task.id ? 'invisible' : (draggedTaskId ? 'pointer-events-none' : '')} ${wasJustUpdated ? 'animate-drop' : ''}`}
+                                        className={`p-1 z-10 transition-all duration-300 ease-in-out ${isDraggable ? 'cursor-grab' : ''} ${draggedWorkPackageId === workPackage.id ? 'invisible' : (draggedWorkPackageId ? 'pointer-events-none' : '')} ${wasJustUpdated ? 'animate-drop' : ''}`}
                                         draggable={isDraggable}
-                                        onDragStart={isDraggable ? (e) => handleDragStart(e, task) : undefined}
+                                        onDragStart={isDraggable ? (e) => handleDragStart(e, workPackage) : undefined}
                                         onDragEnd={isDraggable ? handleDragEnd : undefined}
                                     >
-                                        <TaskCard 
-                                            task={task} 
+                                        <WorkPackageCard 
+                                            workPackage={workPackage} 
                                             maxStack={layoutInfo?.maxStack ?? 1}
-                                            onDoubleClick={onTaskDoubleClick} 
+                                            onDoubleClick={onWorkPackageDoubleClick} 
                                         />
                                     </div>
                                 );

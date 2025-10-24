@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ViewLevel, TeamMember } from '../types';
+import type { ViewLevel } from '../types';
 import { addDays, addMonths, addYears, getFormattedDateRange } from '../utils/dateUtils';
 
 interface ToolbarProps {
@@ -8,9 +8,8 @@ interface ToolbarProps {
   onViewLevelChange: (level: ViewLevel) => void;
   currentDate: Date;
   onCurrentDateChange: (date: Date) => void;
-  filters: { responsible: string; project: string };
-  onFilterChange: (filterType: 'responsible' | 'project', value: string) => void;
-  teamMembers: TeamMember[];
+  filterText: string;
+  onFilterChange: (value: string) => void;
 }
 
 const ChevronLeftIcon = () => (
@@ -26,12 +25,12 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     onViewLevelChange, 
     currentDate, 
     onCurrentDateChange,
-    filters,
+    filterText,
     onFilterChange,
-    teamMembers 
 }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
+  const isFiltered = filterText.length > 0;
 
   const handlePrev = () => {
     if (viewLevel === 'Day') onCurrentDateChange(addDays(currentDate, -7));
@@ -65,36 +64,16 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <div className="text-lg font-semibold text-[var(--color-text-primary)] w-64 text-center">
             {getFormattedDateRange(viewLevel, currentDate, locale)}
         </div>
-         <div className="flex items-center gap-3 border-l border-[var(--color-surface-2)] pl-4">
-          <div>
-            <label htmlFor="responsible-filter" className="sr-only">{t('filterByResponsible')}</label>
-            <select
-              id="responsible-filter"
-              value={filters.responsible}
-              onChange={(e) => onFilterChange('responsible', e.target.value)}
-              className="block w-40 pl-3 pr-10 py-2 text-sm bg-[var(--color-surface-2)] border-[var(--color-surface-3)] text-[var(--color-text-primary)] focus:outline-none focus:ring-[var(--color-main)] focus:border-[var(--color-main)] rounded-md"
-              aria-label={t('filterByResponsible') as string}
-            >
-              <option value="all">{t('all')}</option>
-              {teamMembers.map(member => (
-                <option key={member.id} value={member.id}>
-                  {member.id === 'unassigned' ? t('unassigned') : member.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="project-filter" className="sr-only">{t('filterByProject')}</label>
+         <div className="flex items-center gap-2 border-l border-[var(--color-surface-2)] pl-4">
             <input
               type="text"
-              id="project-filter"
-              placeholder={t('filterByProject') as string}
-              value={filters.project}
-              onChange={(e) => onFilterChange('project', e.target.value)}
-              className="block w-40 pl-3 pr-3 py-2 text-sm bg-[var(--color-surface-2)] border-[var(--color-surface-3)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-[var(--color-main)] focus:border-[var(--color-main)] rounded-md"
-              aria-label={t('filterByProject') as string}
+              id="search-filter"
+              placeholder={t('filterPlaceholder') as string}
+              value={filterText}
+              onChange={(e) => onFilterChange(e.target.value)}
+              className={`block w-80 pl-3 pr-3 py-2 text-sm bg-[var(--color-surface-2)] border border-[var(--color-surface-3)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none rounded-md transition-shadow ${isFiltered ? 'ring-2 ring-inset ring-[var(--color-main)]' : 'focus:ring-2 focus:ring-inset focus:ring-[var(--color-surface-3)]'}`}
+              aria-label={t('filterPlaceholder') as string}
             />
-          </div>
         </div>
       </div>
       

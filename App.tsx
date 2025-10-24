@@ -3,37 +3,48 @@ import { useTranslation } from 'react-i18next';
 import { KanbanBoard } from './components/KanbanBoard';
 import { Toolbar } from './components/Toolbar';
 import { SetupScreen } from './components/SetupScreen';
-import { TaskDetailModal } from './components/TaskDetailModal';
+import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { TEAM_MEMBERS } from './data/team';
-import { TASKS as initialTasks } from './data/tasks';
-import type { ViewLevel, Task } from './types';
+import { WORK_PACKAGES as initialWorkPackages } from './data/work-packages';
+import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage } from './types';
 
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [tasks, setTasks] = useState(initialTasks);
-  const [justUpdatedTaskId, setJustUpdatedTaskId] = useState<string | null>(null);
-  const [filters, setFilters] = useState<{ responsible: string; project: string }>({
-    responsible: 'all',
-    project: '',
-  });
+  const [workPackages, setWorkPackages] = useState<ProjectWorkPackage[]>(initialWorkPackages);
+  const [justUpdatedWorkPackageId, setJustUpdatedWorkPackageId] = useState<string | null>(null);
+  const [filterText, setFilterText] = useState<string>('');
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedWorkPackage, setSelectedWorkPackage] = useState<TaskWorkPackage | null>(null);
 
   useEffect(() => {
     document.body.className = `theme-${theme}`;
     document.documentElement.style.colorScheme = theme;
   }, [theme]);
 
-  const handleTaskUpdate = (updatedTask: Task) => {
-    setTasks(prevTasks =>
-      prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task))
+  const allTasks = useMemo((): TaskWorkPackage[] => {
+    return workPackages.flatMap(project => 
+        project.phases.flatMap(phase => phase.tasks)
     );
-    setJustUpdatedTaskId(updatedTask.id);
+  }, [workPackages]);
+
+  const handleWorkPackageUpdate = (updatedWorkPackage: TaskWorkPackage) => {
+    setWorkPackages(prevProjects => {
+        return prevProjects.map(project => ({
+            ...project,
+            phases: project.phases.map(phase => ({
+                ...phase,
+                tasks: phase.tasks.map(task => 
+                    task.id === updatedWorkPackage.id ? updatedWorkPackage : task
+                )
+            }))
+        }));
+    });
+    setJustUpdatedWorkPackageId(updatedWorkPackage.id);
     setTimeout(() => {
-        setJustUpdatedTaskId(null);
+        setJustUpdatedWorkPackageId(null);
     }, 500); // Reset after animation duration
   };
 
@@ -41,27 +52,30 @@ const App: React.FC = () => {
     i18n.changeLanguage(lng);
   };
 
-  const handleFilterChange = (filterType: 'responsible' | 'project', value: string) => {
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      [filterType]: value,
-    }));
+  const handleFilterChange = (value: string) => {
+    setFilterText(value);
   };
 
-  const handleTaskDoubleClick = (task: Task) => {
-    setSelectedTask(task);
+  const handleWorkPackageDoubleClick = (workPackage: TaskWorkPackage) => {
+    setSelectedWorkPackage(workPackage);
   };
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter(task => {
-      const responsibleMatch =
-        filters.responsible === 'all' || (task.ownerId ?? 'unassigned') === filters.responsible;
-      const projectMatch =
-        filters.project === '' ||
-        task.projectId.toLowerCase().includes(filters.project.toLowerCase());
-      return responsibleMatch && projectMatch;
+    return allTasks.filter(task => {
+      if (filterText === '') return true;
+
+      const lowerCaseFilter = filterText.toLowerCase();
+      
+      const owner = TEAM_MEMBERS.find(m => m.id === task.ownerId);
+      const ownerName = owner ? owner.name : TEAM_MEMBERS.find(m => m.id === 'unassigned')?.name || 'Unassigned';
+
+      const responsibleMatch = ownerName.toLowerCase().includes(lowerCaseFilter);
+      const projectMatch = task.projectId.toLowerCase().includes(lowerCaseFilter);
+      const titleMatch = task.title.toLowerCase().includes(lowerCaseFilter);
+
+      return responsibleMatch || projectMatch || titleMatch;
     });
-  }, [tasks, filters]);
+  }, [allTasks, filterText]);
 
   return (
     <div className="flex flex-col h-screen font-sans bg-[var(--color-back)] text-[var(--color-text-primary)]">
@@ -100,19 +114,18 @@ const App: React.FC = () => {
         onViewLevelChange={setViewLevel}
         currentDate={currentDate}
         onCurrentDateChange={setCurrentDate}
-        filters={filters}
+        filterText={filterText}
         onFilterChange={handleFilterChange}
-        teamMembers={TEAM_MEMBERS}
       />
       <main className="flex-1 overflow-auto p-4">
         <KanbanBoard
           viewLevel={viewLevel}
           currentDate={currentDate}
-          tasks={filteredTasks}
+          workPackages={filteredTasks}
           teamMembers={TEAM_MEMBERS}
-          onTaskUpdate={handleTaskUpdate}
-          justUpdatedTaskId={justUpdatedTaskId}
-          onTaskDoubleClick={handleTaskDoubleClick}
+          onWorkPackageUpdate={handleWorkPackageUpdate}
+          justUpdatedWorkPackageId={justUpdatedWorkPackageId}
+          onWorkPackageDoubleClick={handleWorkPackageDoubleClick}
         />
       </main>
       {isSetupOpen && (
@@ -124,10 +137,10 @@ const App: React.FC = () => {
           onChangeLang={changeLanguage}
         />
       )}
-      {selectedTask && (
-        <TaskDetailModal
-          task={selectedTask}
-          onClose={() => setSelectedTask(null)}
+      {selectedWorkPackage && (
+        <WorkPackageDetailModal
+          workPackage={selectedWorkPackage}
+          onClose={() => setSelectedWorkPackage(null)}
           teamMembers={TEAM_MEMBERS}
         />
       )}
