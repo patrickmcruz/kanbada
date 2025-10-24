@@ -4,6 +4,12 @@ import { addDays, getStartOfWeek } from './utils/dateUtils';
 const today = new Date();
 const startOfWeek = getStartOfWeek(today);
 
+// Calculate the first Monday of October for the current year.
+const firstMondayOfOctober = new Date(new Date().getFullYear(), 9, 1); // Month is 0-indexed, so 9 is October.
+while (firstMondayOfOctober.getDay() !== 1) { // 1 = Monday
+  firstMondayOfOctober.setDate(firstMondayOfOctober.getDate() + 1);
+}
+
 export const TEAM_MEMBERS: TeamMember[] = [
   { id: 'joaozinho', name: 'joãozinho' },
   { id: 'pietrinho', name: 'pietrinho' },
@@ -17,10 +23,10 @@ export const TASKS: Task[] = [
     id: 'task-1',
     title: 'TÍTULO PROJETO EXEMPLO 01',
     projectId: 'P06',
-    hours: 40,
+    hours: 120, // 40h/week * 3 weeks
     ownerId: 'joaozinho',
-    startDate: startOfWeek,
-    endDate: addDays(startOfWeek, 3),
+    startDate: firstMondayOfOctober,
+    endDate: addDays(firstMondayOfOctober, 18), // 3 work weeks (Mon-Fri)
   },
   // Pietrinho's tasks
   {
@@ -86,15 +92,15 @@ export const TASKS: Task[] = [
     hours: 8,
     ownerId: 'robertinho',
     startDate: addDays(startOfWeek, 3),
-    endDate: addDays(startOfWeek, 3),
+    endDate: addDays(startOfWeek, 4),
   },
   // Unassigned tasks
   { id: 'task-9', title: 'E', projectId: '', hours: 2, ownerId: null, startDate: startOfWeek, endDate: startOfWeek },
   { id: 'task-10', title: 'F', projectId: '', hours: 2, ownerId: null, startDate: startOfWeek, endDate: startOfWeek },
   { id: 'task-11', title: 'G', projectId: '', hours: 2, ownerId: null, startDate: startOfWeek, endDate: startOfWeek },
   { id: 'task-12', title: 'H', projectId: '', hours: 2, ownerId: null, startDate: startOfWeek, endDate: startOfWeek },
-  { id: 'task-13', title: 'E', projectId: '', hours: 2, ownerId: null, startDate: addDays(startOfWeek, 3), endDate: addDays(startOfWeek, 3) },
-  { id: 'task-14', title: 'F', projectId: '', hours: 2, ownerId: null, startDate: addDays(startOfWeek, 3), endDate: addDays(startOfWeek, 3) },
-  { id: 'task-15', title: 'G', projectId: '', hours: 2, ownerId: null, startDate: addDays(startOfWeek, 3), endDate: addDays(startOfWeek, 3) },
-  { id: 'task-16', title: 'H', projectId: '', hours: 2, ownerId: null, startDate: addDays(startOfWeek, 3), endDate: addDays(startOfWeek, 3) },
+  { id: 'task-13', title: 'E', projectId: '', hours: 2, ownerId: null, startDate: addDays(startOfWeek, 3), endDate: addDays(startOfWeek, 4) },
+  { id: 'task-14', title: 'F', projectId: '', hours: 2, ownerId: null, startDate: addDays(startOfWeek, 3), endDate: addDays(startOfWeek, 4) },
+  { id: 'task-15', title: 'G', projectId: '', hours: 2, ownerId: null, startDate: addDays(startOfWeek, 3), endDate: addDays(startOfWeek, 4) },
+  { id: 'task-16', title: 'H', projectId: '', hours: 2, ownerId: null, startDate: addDays(startOfWeek, 3), endDate: addDays(startOfWeek, 4) },
 ];
