@@ -8,6 +8,12 @@ import { TEAM_MEMBERS } from './data/team';
 import { WORK_PACKAGES as initialWorkPackages } from './data/work-packages';
 import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage } from './types';
 
+interface SelectedWorkPackageInfo {
+  task: TaskWorkPackage;
+  phaseTitle: string;
+  projectTitle: string;
+}
+
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
@@ -17,7 +23,7 @@ const App: React.FC = () => {
   const [filterText, setFilterText] = useState<string>('');
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [selectedWorkPackage, setSelectedWorkPackage] = useState<TaskWorkPackage | null>(null);
+  const [selectedWorkPackageInfo, setSelectedWorkPackageInfo] = useState<SelectedWorkPackageInfo | null>(null);
 
   useEffect(() => {
     document.body.className = `theme-${theme}`;
@@ -56,8 +62,22 @@ const App: React.FC = () => {
     setFilterText(value);
   };
 
-  const handleWorkPackageDoubleClick = (workPackage: TaskWorkPackage) => {
-    setSelectedWorkPackage(workPackage);
+  const handleWorkPackageDoubleClick = (task: TaskWorkPackage) => {
+    let phaseTitle = 'N/A';
+    let projectTitle = 'N/A';
+    
+    for (const project of workPackages) {
+      for (const phase of project.phases) {
+        if (phase.tasks.some(t => t.id === task.id)) {
+          phaseTitle = phase.title;
+          projectTitle = project.title;
+          break;
+        }
+      }
+      if (projectTitle !== 'N/A') break;
+    }
+    
+    setSelectedWorkPackageInfo({ task, phaseTitle, projectTitle });
   };
 
   const filteredTasks = useMemo(() => {
@@ -137,10 +157,12 @@ const App: React.FC = () => {
           onChangeLang={changeLanguage}
         />
       )}
-      {selectedWorkPackage && (
+      {selectedWorkPackageInfo && (
         <WorkPackageDetailModal
-          workPackage={selectedWorkPackage}
-          onClose={() => setSelectedWorkPackage(null)}
+          workPackage={selectedWorkPackageInfo.task}
+          phaseTitle={selectedWorkPackageInfo.phaseTitle}
+          projectTitle={selectedWorkPackageInfo.projectTitle}
+          onClose={() => setSelectedWorkPackageInfo(null)}
           teamMembers={TEAM_MEMBERS}
         />
       )}

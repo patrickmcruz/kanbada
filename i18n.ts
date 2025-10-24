@@ -26,11 +26,16 @@ const resources = {
       light: "Light",
       close: "Close",
       // TaskDetailModal.tsx
-      taskDetails: "Task Details",
+      taskDetails: "Work Package Details",
       project: "Project",
+      phase: "Phase",
       title: "Title",
       startDate: "Start Date",
       endDate: "End Date",
+      duration: "Duration",
+      // FIX: Renamed 'day' to 'day_singular' to avoid duplicate key error.
+      day_singular: "day",
+      days: "days",
       hours: "Hours",
       priority: "Priority",
     }
@@ -58,11 +63,16 @@ const resources = {
       light: "Claro",
       close: "Fechar",
       // TaskDetailModal.tsx
-      taskDetails: "Detalhes da Tarefa",
+      taskDetails: "Detalhes do Pacote de Trabalho",
       project: "Projeto",
+      phase: "Fase",
       title: "Título",
       startDate: "Data de Início",
       endDate: "Data de Fim",
+      duration: "Duração",
+      // FIX: Renamed 'day' to 'day_singular' to avoid duplicate key error.
+      day_singular: "dia",
+      days: "dias",
       hours: "Horas",
       priority: "Prioridade",
     }
