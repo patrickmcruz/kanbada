@@ -4,9 +4,10 @@ import { KanbanBoard } from './components/KanbanBoard';
 import { Toolbar } from './components/Toolbar';
 import { SetupScreen } from './components/SetupScreen';
 import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
+import { FilterModal } from './components/FilterModal';
 import { TEAM_MEMBERS } from './data/team';
 import { WORK_PACKAGES as initialWorkPackages } from './data/work-packages';
-import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage } from './types';
+import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, Filters } from './types';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -21,6 +22,8 @@ const App: React.FC = () => {
   const [workPackages, setWorkPackages] = useState<ProjectWorkPackage[]>(initialWorkPackages);
   const [justUpdatedWorkPackageId, setJustUpdatedWorkPackageId] = useState<string | null>(null);
   const [filterText, setFilterText] = useState<string>('');
+  const [advancedFilters, setAdvancedFilters] = useState<Filters>({ responsibles: [], priorities: [] });
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [selectedWorkPackageInfo, setSelectedWorkPackageInfo] = useState<SelectedWorkPackageInfo | null>(null);
@@ -61,6 +64,13 @@ const App: React.FC = () => {
   const handleFilterChange = (value: string) => {
     setFilterText(value);
   };
+  
+  const handleApplyAdvancedFilters = (newFilters: Filters) => {
+    setAdvancedFilters(newFilters);
+    setIsFilterModalOpen(false);
+  };
+  
+  const isAdvancedFilterActive = advancedFilters.responsibles.length > 0 || advancedFilters.priorities.length > 0;
 
   const handleWorkPackageDoubleClick = (task: TaskWorkPackage) => {
     let phaseTitle = 'N/A';
@@ -82,20 +92,32 @@ const App: React.FC = () => {
 
   const filteredTasks = useMemo(() => {
     return allTasks.filter(task => {
-      if (filterText === '') return true;
+      // Text filter
+      const textFilterMatch = (() => {
+        if (filterText === '') return true;
+        const lowerCaseFilter = filterText.toLowerCase();
+        const owner = TEAM_MEMBERS.find(m => m.id === task.ownerId);
+        const ownerName = owner ? owner.name : TEAM_MEMBERS.find(m => m.id === 'unassigned')?.name || 'Unassigned';
+        const responsibleMatch = ownerName.toLowerCase().includes(lowerCaseFilter);
+        const projectMatch = task.projectId.toLowerCase().includes(lowerCaseFilter);
+        const titleMatch = task.title.toLowerCase().includes(lowerCaseFilter);
+        return responsibleMatch || projectMatch || titleMatch;
+      })();
+      if (!textFilterMatch) return false;
 
-      const lowerCaseFilter = filterText.toLowerCase();
-      
-      const owner = TEAM_MEMBERS.find(m => m.id === task.ownerId);
-      const ownerName = owner ? owner.name : TEAM_MEMBERS.find(m => m.id === 'unassigned')?.name || 'Unassigned';
+      // Advanced responsible filter
+      const responsibleFilterMatch = advancedFilters.responsibles.length === 0 || 
+        advancedFilters.responsibles.includes(task.ownerId ?? 'unassigned');
+      if (!responsibleFilterMatch) return false;
 
-      const responsibleMatch = ownerName.toLowerCase().includes(lowerCaseFilter);
-      const projectMatch = task.projectId.toLowerCase().includes(lowerCaseFilter);
-      const titleMatch = task.title.toLowerCase().includes(lowerCaseFilter);
+      // Advanced priority filter
+      const priorityFilterMatch = advancedFilters.priorities.length === 0 ||
+        (task.priority && advancedFilters.priorities.includes(task.priority));
+      if (!priorityFilterMatch) return false;
 
-      return responsibleMatch || projectMatch || titleMatch;
+      return true;
     });
-  }, [allTasks, filterText]);
+  }, [allTasks, filterText, advancedFilters]);
 
   return (
     <div className="flex flex-col h-screen font-sans bg-[var(--color-back)] text-[var(--color-text-primary)]">
@@ -136,6 +158,8 @@ const App: React.FC = () => {
         onCurrentDateChange={setCurrentDate}
         filterText={filterText}
         onFilterChange={handleFilterChange}
+        onOpenFilterModal={() => setIsFilterModalOpen(true)}
+        isAdvancedFilterActive={isAdvancedFilterActive}
       />
       <main className="flex-1 overflow-auto p-4">
         <KanbanBoard
@@ -155,6 +179,14 @@ const App: React.FC = () => {
           onChangeTheme={setTheme}
           currentLang={i18n.language}
           onChangeLang={changeLanguage}
+        />
+      )}
+      {isFilterModalOpen && (
+        <FilterModal
+            onClose={() => setIsFilterModalOpen(false)}
+            onApply={handleApplyAdvancedFilters}
+            currentFilters={advancedFilters}
+            teamMembers={TEAM_MEMBERS}
         />
       )}
       {selectedWorkPackageInfo && (

@@ -10,6 +10,8 @@ interface ToolbarProps {
   onCurrentDateChange: (date: Date) => void;
   filterText: string;
   onFilterChange: (value: string) => void;
+  onOpenFilterModal: () => void;
+  isAdvancedFilterActive: boolean;
 }
 
 const ChevronLeftIcon = () => (
@@ -17,6 +19,9 @@ const ChevronLeftIcon = () => (
 );
 const ChevronRightIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+);
+const FilterIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
 );
 
 
@@ -27,6 +32,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     onCurrentDateChange,
     filterText,
     onFilterChange,
+    onOpenFilterModal,
+    isAdvancedFilterActive,
 }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
@@ -74,6 +81,16 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               className={`block w-80 pl-3 pr-3 py-2 text-sm bg-[var(--color-surface-2)] border border-[var(--color-surface-3)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none rounded-md transition-shadow ${isFiltered ? 'ring-2 ring-inset ring-[var(--color-main)]' : 'focus:ring-2 focus:ring-inset focus:ring-[var(--color-surface-3)]'}`}
               aria-label={t('filterPlaceholder') as string}
             />
+            <button
+                onClick={onOpenFilterModal}
+                className="relative p-2 text-sm font-medium text-[var(--color-text-primary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--color-back)] focus:ring-[var(--color-main)]"
+                aria-label={t('advancedFilters') as string}
+            >
+                <FilterIcon />
+                {isAdvancedFilterActive && (
+                    <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-[var(--color-surface-1)]" />
+                )}
+            </button>
         </div>
       </div>
       

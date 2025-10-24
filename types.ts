@@ -7,6 +7,16 @@ export interface TeamMember {
   name: string;
 }
 
+// Explicit priority type
+export type Priority = 'Urgente' | 'Alta' | 'Média' | 'Baixa';
+
+// Interface for advanced filters
+export interface Filters {
+  responsibles: string[];
+  priorities: Priority[];
+}
+
+
 // Base interface for all work packages
 interface WorkPackageBase {
   id: string;
@@ -36,7 +46,7 @@ export interface TaskWorkPackage extends WorkPackageBase {
   hours: number;
   ownerId: string | null; // null for unassigned
   isDemand?: boolean; // For special styling
-  priority?: 'Urgente' | 'Alta' | 'Média' | 'Baixa';
+  priority?: Priority;
 }
 
 export type WorkPackage = ProjectWorkPackage | PhaseWorkPackage | TaskWorkPackage;

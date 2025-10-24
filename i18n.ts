@@ -19,12 +19,15 @@ const resources = {
       // KanbanBoard.tsx
       responsible: "Responsible",
       unassigned: "Unassigned",
-      // SetupScreen.tsx
+      // SetupScreen.tsx & FilterModal.tsx
       theme: "Theme",
       language: "Language",
       dark: "Dark",
       light: "Light",
       close: "Close",
+      advancedFilters: "Advanced Filters",
+      applyFilters: "Apply Filters",
+      clearFilters: "Clear Filters",
       // TaskDetailModal.tsx
       taskDetails: "Work Package Details",
       project: "Project",
@@ -56,12 +59,15 @@ const resources = {
       // KanbanBoard.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",
-      // SetupScreen.tsx
+      // SetupScreen.tsx & FilterModal.tsx
       theme: "Tema",
       language: "Idioma",
       dark: "Escuro",
       light: "Claro",
       close: "Fechar",
+      advancedFilters: "Filtros Avançados",
+      applyFilters: "Aplicar Filtros",
+      clearFilters: "Limpar Filtros",
       // TaskDetailModal.tsx
       taskDetails: "Detalhes do Pacote de Trabalho",
       project: "Projeto",
