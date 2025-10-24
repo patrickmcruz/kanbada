@@ -4,7 +4,8 @@ import { KanbanBoard } from './components/KanbanBoard';
 import { Toolbar } from './components/Toolbar';
 import { SetupScreen } from './components/SetupScreen';
 import { TaskDetailModal } from './components/TaskDetailModal';
-import { TEAM_MEMBERS, TASKS as initialTasks } from './constants';
+import { TEAM_MEMBERS } from './data/team';
+import { TASKS as initialTasks } from './data/tasks';
 import type { ViewLevel, Task } from './types';
 
 const App: React.FC = () => {

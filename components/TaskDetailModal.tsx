@@ -59,6 +59,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose,
                 <DetailRow label={t('project')} value={task.projectId || 'N/A'} />
                 <DetailRow label={t('title')} value={task.title} />
                 <DetailRow label={t('responsible')} value={responsibleName} />
+                {task.priority && <DetailRow label={t('priority')} value={task.priority} />}
                 <DetailRow label={t('startDate')} value={formatDate(task.startDate)} />
                 <DetailRow label={t('endDate')} value={formatDate(task.endDate)} />
                 <DetailRow label={t('hours')} value={`${task.hours}h`} />

@@ -33,6 +33,7 @@ const resources = {
       startDate: "Start Date",
       endDate: "End Date",
       hours: "Hours",
+      priority: "Priority",
     }
   },
   pt: {
@@ -65,6 +66,7 @@ const resources = {
       startDate: "Data de Início",
       endDate: "Data de Fim",
       hours: "Horas",
+      priority: "Prioridade",
     }
   }
 };

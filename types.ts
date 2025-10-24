@@ -1,4 +1,5 @@
 
+
 export type ViewLevel = 'Day' | 'Week' | 'Month';
 
 export interface TeamMember {
@@ -15,6 +16,7 @@ export interface Task {
   startDate: Date;
   endDate: Date;
   isDemand?: boolean; // For special styling
+  priority?: 'Urgente' | 'Alta' | 'Média' | 'Baixa';
 }
 
 export interface DateColumn {
