@@ -13,9 +13,10 @@ interface FilterComboboxProps {
     onChange: (value: string) => void;
     options: string[];
     placeholder: string;
+    renderOption?: (option: string) => React.ReactNode;
 }
 
-export const FilterCombobox: React.FC<FilterComboboxProps> = ({ value, onChange, options, placeholder }) => {
+export const FilterCombobox: React.FC<FilterComboboxProps> = ({ value, onChange, options, placeholder, renderOption }) => {
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -72,7 +73,7 @@ export const FilterCombobox: React.FC<FilterComboboxProps> = ({ value, onChange,
                                     onClick={() => handleSelectOption(option)}
                                     className="px-3 py-2 text-sm text-[var(--color-text-primary)] cursor-pointer hover:bg-[var(--color-surface-3)]"
                                 >
-                                    {option}
+                                    {renderOption ? renderOption(option) : option}
                                 </li>
                             ))
                         ) : (

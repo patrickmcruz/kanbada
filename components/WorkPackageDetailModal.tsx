@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TaskWorkPackage, TeamMember } from '../types';
 import { daysBetween } from '../utils/dateUtils';
+import { getPriorityClasses } from '../utils/styleUtils';
 
 interface WorkPackageDetailModalProps {
   workPackage: TaskWorkPackage;
@@ -21,22 +22,6 @@ const DetailRow: React.FC<{ label: string; value: string | React.ReactNode }> = 
         <dd className="mt-1 text-md text-[var(--color-text-primary)]">{value}</dd>
     </div>
 );
-
-const getPriorityClasses = (priority?: TaskWorkPackage['priority']): { dot: string; text: string } => {
-    switch (priority) {
-      case 'Urgente':
-        return { dot: 'bg-purple-500', text: 'text-purple-400' };
-      case 'Alta':
-        return { dot: 'bg-red-500', text: 'text-red-400' };
-      case 'Média':
-        return { dot: 'bg-yellow-500', text: 'text-yellow-400' };
-      case 'Baixa':
-        return { dot: 'bg-blue-500', text: 'text-blue-400' };
-      default:
-        return { dot: 'bg-gray-500', text: 'text-gray-400' };
-    }
-  };
-
 
 export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ workPackage, phaseTitle, projectTitle, onClose, teamMembers }) => {
   const { t, i18n } = useTranslation();

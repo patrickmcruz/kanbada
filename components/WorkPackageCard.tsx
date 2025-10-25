@@ -1,5 +1,6 @@
 import React from 'react';
 import type { TaskWorkPackage } from '../types';
+import { getPriorityClasses } from '../utils/styleUtils';
 
 interface WorkPackageCardProps {
   workPackage: TaskWorkPackage;
@@ -7,25 +8,9 @@ interface WorkPackageCardProps {
   onDoubleClick: (workPackage: TaskWorkPackage) => void;
 }
 
-const getPriorityBorderColor = (priority?: TaskWorkPackage['priority']): string => {
-  switch (priority) {
-    case 'Urgente':
-      return 'border-purple-500';
-    case 'Alta':
-      return 'border-red-500';
-    case 'Média':
-      return 'border-yellow-500';
-    case 'Baixa':
-      return 'border-blue-500';
-    default:
-      return 'border-[var(--color-main)]';
-  }
-};
-
-
 export const WorkPackageCard: React.FC<WorkPackageCardProps> = ({ workPackage, maxStack, onDoubleClick }) => {
   const cardBg = workPackage.isDemand ? 'bg-[var(--color-demand-card-bg)]' : 'bg-[var(--color-surface-2)]';
-  const borderColor = getPriorityBorderColor(workPackage.priority);
+  const { border: borderColor } = getPriorityClasses(workPackage.priority);
   const isCompact = maxStack > 2;
 
   return (

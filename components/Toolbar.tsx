@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ViewLevel } from '../types';
+import type { Priority, ViewLevel } from '../types';
 import { addDays, addMonths, addYears, getFormattedDateRange } from '../utils/dateUtils';
+import { getPriorityClasses } from '../utils/styleUtils';
 import { FilterCombobox } from './FilterCombobox';
 
 interface ToolbarProps {
@@ -62,6 +63,17 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     onCurrentDateChange(new Date());
   };
 
+  const renderPriorityOption = (option: string) => {
+    const priority = option as Priority;
+    const { dot } = getPriorityClasses(priority);
+    return (
+        <div className="flex items-center gap-2">
+            <span className={`w-3 h-3 rounded-full ${dot}`}></span>
+            <span>{option}</span>
+        </div>
+    );
+  };
+
   return (
     <div className="flex items-center justify-between p-3 bg-[var(--color-surface-1)] border-b border-[var(--color-surface-2)] gap-4">
       {/* Left side: Navigation and Date */}
@@ -100,6 +112,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             onChange={onFilterPriorityChange}
             options={priorityOptions}
             placeholder={t('priorityPlaceholder') as string}
+            renderOption={renderPriorityOption}
           />
       </div>
 
