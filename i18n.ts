@@ -18,6 +18,7 @@ const resources = {
       responsiblePlaceholder: "Filter by Responsible...",
       priorityPlaceholder: "Filter by Priority...",
       clearFilter: "Clear filter",
+      noOptionsFound: "No options found",
       // KanbanBoard.tsx
       responsible: "Responsible",
       unassigned: "Unassigned",
@@ -58,6 +59,7 @@ const resources = {
       responsiblePlaceholder: "Filtrar por Responsável...",
       priorityPlaceholder: "Filtrar por Prioridade...",
       clearFilter: "Limpar filtro",
+      noOptionsFound: "Nenhuma opção encontrada",
       // KanbanBoard.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",

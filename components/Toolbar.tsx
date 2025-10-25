@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ViewLevel } from '../types';
 import { addDays, addMonths, addYears, getFormattedDateRange } from '../utils/dateUtils';
+import { FilterCombobox } from './FilterCombobox';
 
 interface ToolbarProps {
   viewLevel: ViewLevel;
@@ -14,6 +15,9 @@ interface ToolbarProps {
   onFilterResponsibleChange: (text: string) => void;
   filterPriority: string;
   onFilterPriorityChange: (text: string) => void;
+  cardNameOptions: string[];
+  responsibleOptions: string[];
+  priorityOptions: string[];
 }
 
 const ChevronLeftIcon = () => (
@@ -22,12 +26,7 @@ const ChevronLeftIcon = () => (
 const ChevronRightIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
 );
-const SearchIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-text-secondary)]"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-);
-const XIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-);
+
 
 export const Toolbar: React.FC<ToolbarProps> = ({ 
     viewLevel, 
@@ -39,7 +38,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     filterResponsible,
     onFilterResponsibleChange,
     filterPriority,
-    onFilterPriorityChange
+    onFilterPriorityChange,
+    cardNameOptions,
+    responsibleOptions,
+    priorityOptions,
 }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
@@ -81,69 +83,24 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       
       {/* Middle: Filters (takes remaining space) */}
       <div className="flex-1 flex items-center gap-2">
-          <div className="relative w-1/3">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <SearchIcon />
-              </span>
-              <input
-                  type="text"
-                  placeholder={t('cardNamePlaceholder') as string}
-                  value={filterText}
-                  onChange={(e) => onFilterTextChange(e.target.value)}
-                  className="w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-surface-2)] py-2 pl-10 pr-10 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
-              />
-              {filterText && (
-                <button
-                    onClick={() => onFilterTextChange('')}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-                    aria-label={t('clearFilter') as string}
-                >
-                    <XIcon />
-                </button>
-              )}
-          </div>
-          <div className="relative w-1/3">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <SearchIcon />
-              </span>
-              <input
-                  type="text"
-                  placeholder={t('responsiblePlaceholder') as string}
-                  value={filterResponsible}
-                  onChange={(e) => onFilterResponsibleChange(e.target.value)}
-                  className="w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-surface-2)] py-2 pl-10 pr-10 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
-              />
-              {filterResponsible && (
-                <button
-                    onClick={() => onFilterResponsibleChange('')}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-                    aria-label={t('clearFilter') as string}
-                >
-                    <XIcon />
-                </button>
-              )}
-          </div>
-          <div className="relative w-1/3">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <SearchIcon />
-              </span>
-              <input
-                  type="text"
-                  placeholder={t('priorityPlaceholder') as string}
-                  value={filterPriority}
-                  onChange={(e) => onFilterPriorityChange(e.target.value)}
-                  className="w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-surface-2)] py-2 pl-10 pr-10 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
-              />
-              {filterPriority && (
-                <button
-                    onClick={() => onFilterPriorityChange('')}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-                    aria-label={t('clearFilter') as string}
-                >
-                    <XIcon />
-                </button>
-              )}
-          </div>
+          <FilterCombobox
+            value={filterText}
+            onChange={onFilterTextChange}
+            options={cardNameOptions}
+            placeholder={t('cardNamePlaceholder') as string}
+          />
+          <FilterCombobox
+            value={filterResponsible}
+            onChange={onFilterResponsibleChange}
+            options={responsibleOptions}
+            placeholder={t('responsiblePlaceholder') as string}
+          />
+          <FilterCombobox
+            value={filterPriority}
+            onChange={onFilterPriorityChange}
+            options={priorityOptions}
+            placeholder={t('priorityPlaceholder') as string}
+          />
       </div>
 
       {/* Right side: View switcher */}

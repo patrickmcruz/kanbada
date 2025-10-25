@@ -6,7 +6,7 @@ import { SetupScreen } from './components/SetupScreen';
 import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { TEAM_MEMBERS } from './data/team';
 import { WORK_PACKAGES as initialWorkPackages } from './data/work-packages';
-import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage } from './types';
+import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage, Priority } from './types';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -50,6 +50,32 @@ const App: React.FC = () => {
       return [];
     });
   }, [workPackages]);
+
+  const cardNameOptions = useMemo(() => {
+    const titles = new Set<string>();
+    allTasks.forEach(task => {
+      titles.add(task.title);
+      titles.add(task.projectId);
+    });
+    return Array.from(titles).sort();
+  }, [allTasks]);
+
+  const responsibleOptions = useMemo(() => {
+    const memberMap = new Map(TEAM_MEMBERS.map(m => [m.id, m.name]));
+    const responsibles = new Set<string>();
+    allTasks.forEach(task => {
+      const name = memberMap.get(task.ownerId ?? 'unassigned');
+      if (name) {
+        responsibles.add(name);
+      }
+    });
+    return Array.from(responsibles).sort();
+  }, [allTasks]);
+
+  const priorityOptions = useMemo(() => {
+    const priorities: Priority[] = ['Urgente', 'Alta', 'Média', 'Baixa'];
+    return priorities;
+  }, []);
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -151,6 +177,9 @@ const App: React.FC = () => {
         onFilterResponsibleChange={setFilterResponsible}
         filterPriority={filterPriority}
         onFilterPriorityChange={setFilterPriority}
+        cardNameOptions={cardNameOptions}
+        responsibleOptions={responsibleOptions}
+        priorityOptions={priorityOptions}
       />
       <main className="flex-1 overflow-auto p-4">
         <KanbanBoard
