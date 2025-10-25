@@ -10,12 +10,12 @@ interface ToolbarProps {
   onViewLevelChange: (level: ViewLevel) => void;
   currentDate: Date;
   onCurrentDateChange: (date: Date) => void;
-  filterText: string;
-  onFilterTextChange: (text: string) => void;
-  filterResponsible: string;
-  onFilterResponsibleChange: (text: string) => void;
-  filterPriority: string;
-  onFilterPriorityChange: (text: string) => void;
+  filterCardName: string[];
+  onFilterCardNameChange: (value: string[]) => void;
+  filterResponsible: string[];
+  onFilterResponsibleChange: (value: string[]) => void;
+  filterPriority: string[];
+  onFilterPriorityChange: (value: string[]) => void;
   cardNameOptions: string[];
   responsibleOptions: string[];
   priorityOptions: string[];
@@ -34,8 +34,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     onViewLevelChange, 
     currentDate, 
     onCurrentDateChange,
-    filterText,
-    onFilterTextChange,
+    filterCardName,
+    onFilterCardNameChange,
     filterResponsible,
     onFilterResponsibleChange,
     filterPriority,
@@ -96,8 +96,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       {/* Middle: Filters (takes remaining space) */}
       <div className="flex-1 flex items-center gap-2">
           <FilterCombobox
-            value={filterText}
-            onChange={onFilterTextChange}
+            value={filterCardName}
+            onChange={onFilterCardNameChange}
             options={cardNameOptions}
             placeholder={t('cardNamePlaceholder') as string}
           />
@@ -113,6 +113,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             options={priorityOptions}
             placeholder={t('priorityPlaceholder') as string}
             renderOption={renderPriorityOption}
+            showSearch={false}
           />
       </div>
 

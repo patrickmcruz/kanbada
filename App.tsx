@@ -19,9 +19,9 @@ const App: React.FC = () => {
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [workPackages, setWorkPackages] = useState<(ProjectWorkPackage | DemandWorkPackage)[]>(initialWorkPackages);
-  const [filterText, setFilterText] = useState('');
-  const [filterResponsible, setFilterResponsible] = useState('');
-  const [filterPriority, setFilterPriority] = useState('');
+  const [filterCardName, setFilterCardName] = useState<string[]>([]);
+  const [filterResponsible, setFilterResponsible] = useState<string[]>([]);
+  const [filterPriority, setFilterPriority] = useState<string[]>([]);
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [selectedWorkPackageInfo, setSelectedWorkPackageInfo] = useState<SelectedWorkPackageInfo | null>(null);
@@ -111,27 +111,20 @@ const App: React.FC = () => {
   const filteredTasks = useMemo(() => {
     const responsibleMap = new Map(TEAM_MEMBERS.map(member => [member.id, member.name]));
 
-    const text = filterText.toLowerCase().trim();
-    const responsible = filterResponsible.toLowerCase().trim();
-    const priority = filterPriority.toLowerCase().trim();
-
-    if (!text && !responsible && !priority) {
+    if (filterCardName.length === 0 && filterResponsible.length === 0 && filterPriority.length === 0) {
       return allTasks;
     }
 
     return allTasks.filter(task => {
-      const taskTitle = task.title.toLowerCase();
-      const taskProjectId = task.projectId.toLowerCase();
-      const taskResponsibleName = (responsibleMap.get(task.ownerId ?? 'unassigned') ?? '').toLowerCase();
-      const taskPriority = (task.priority ?? '').toLowerCase();
+      const taskResponsibleName = responsibleMap.get(task.ownerId ?? 'unassigned') ?? '';
 
-      const textMatch = !text || taskTitle.includes(text) || taskProjectId.includes(text);
-      const responsibleMatch = !responsible || taskResponsibleName.includes(responsible);
-      const priorityMatch = !priority || taskPriority.includes(priority);
+      const cardNameMatch = filterCardName.length === 0 || filterCardName.includes(task.title) || filterCardName.includes(task.projectId);
+      const responsibleMatch = filterResponsible.length === 0 || filterResponsible.includes(taskResponsibleName);
+      const priorityMatch = filterPriority.length === 0 || (task.priority && filterPriority.includes(task.priority));
 
-      return textMatch && responsibleMatch && priorityMatch;
+      return cardNameMatch && responsibleMatch && priorityMatch;
     });
-  }, [allTasks, filterText, filterResponsible, filterPriority]);
+  }, [allTasks, filterCardName, filterResponsible, filterPriority]);
 
   return (
     <div className="flex flex-col h-screen font-sans bg-[var(--color-back)] text-[var(--color-text-primary)]">
@@ -171,8 +164,8 @@ const App: React.FC = () => {
         onViewLevelChange={setViewLevel}
         currentDate={currentDate}
         onCurrentDateChange={setCurrentDate}
-        filterText={filterText}
-        onFilterTextChange={setFilterText}
+        filterCardName={filterCardName}
+        onFilterCardNameChange={setFilterCardName}
         filterResponsible={filterResponsible}
         onFilterResponsibleChange={setFilterResponsible}
         filterPriority={filterPriority}

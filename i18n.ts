@@ -19,6 +19,7 @@ const resources = {
       priorityPlaceholder: "Priority...",
       clearFilter: "Clear filter",
       noOptionsFound: "No options found",
+      searchInDropdown: "Search options...",
       // KanbanBoard.tsx
       responsible: "Responsible",
       unassigned: "Unassigned",
@@ -60,6 +61,7 @@ const resources = {
       priorityPlaceholder: "Prioridade...",
       clearFilter: "Limpar filtro",
       noOptionsFound: "Nenhuma opção encontrada",
+      searchInDropdown: "Buscar opções...",
       // KanbanBoard.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",
