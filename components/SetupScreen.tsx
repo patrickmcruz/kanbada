@@ -111,7 +111,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
             <div className='space-y-2'>
                 {kanbanColumns.map(column => (
                     <div key={column} className="flex items-center justify-between bg-[var(--color-surface-2)] p-2 rounded-md">
-                        <span className="text-sm">{column}</span>
+                        <span className="text-sm">{t(column)}</span>
                         <button 
                             onClick={() => handleDeleteColumn(column)}
                             className="p-1 rounded-full text-red-400 hover:bg-red-500/20"

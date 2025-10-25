@@ -8,6 +8,7 @@ import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { TEAM_MEMBERS } from './data/team';
 import { WORK_PACKAGES as initialWorkPackages } from './data/work-packages';
 import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage, Priority, AppView } from './types';
+import { getStartOfWeek, addDays, getStartOfDay } from './utils/dateUtils';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -21,7 +22,7 @@ const App: React.FC = () => {
   const [activeView, setActiveView] = useState<AppView>('Workload');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [workPackages, setWorkPackages] = useState<(ProjectWorkPackage | DemandWorkPackage)[]>(initialWorkPackages);
-  const [kanbanColumns, setKanbanColumns] = useState<string[]>([t('toDo'), t('doing'), t('done')]);
+  const [kanbanColumns, setKanbanColumns] = useState<string[]>(['toDo', 'sprint', 'doing', 'done']);
 
   const [filterCardName, setFilterCardName] = useState<string[]>([]);
   const [filterResponsible, setFilterResponsible] = useState<string[]>([]);
@@ -35,18 +36,6 @@ const App: React.FC = () => {
     document.documentElement.style.colorScheme = theme;
   }, [theme]);
   
-  // Update default Kanban columns when language changes
-  useEffect(() => {
-    setKanbanColumns(prevCols => {
-        // A simple way to check if they are default, might need improvement
-        const defaultKeys = ['toDo', 'doing', 'done'];
-        const currentDefaultTranslations = defaultKeys.map(key => t(key));
-        if (prevCols.every(col => currentDefaultTranslations.includes(col))) {
-            return [t('toDo'), t('doing'), t('done')];
-        }
-        return prevCols;
-    });
-  }, [i18n.language, t]);
 
   const allTasks = useMemo((): TaskWorkPackage[] => {
     // FIX: Add explicit type argument to flatMap to resolve type inference issue.
@@ -170,6 +159,25 @@ const App: React.FC = () => {
     });
   }, [allTasks, filterCardName, filterResponsible, filterPriority]);
 
+  const kanbanTasks = useMemo(() => {
+      const weekStart = getStartOfWeek(currentDate);
+      const weekEnd = addDays(weekStart, 6); // Sunday of that week
+      
+      const weekStartSOD = getStartOfDay(weekStart);
+      const weekEndSOD = getStartOfDay(weekEnd);
+  
+      return filteredTasks.filter(task => {
+          const taskStartSOD = getStartOfDay(task.startDate);
+          const taskEndSOD = getStartOfDay(task.endDate);
+  
+          // Check for overlap: A task overlaps if its period intersects with the week's period.
+          const overlaps = taskStartSOD.getTime() <= weekEndSOD.getTime() && taskEndSOD.getTime() >= weekStartSOD.getTime();
+          
+          return overlaps;
+      });
+  
+  }, [filteredTasks, currentDate]);
+
   return (
     <div className="flex flex-col h-screen font-sans bg-[var(--color-back)] text-[var(--color-text-primary)]">
       <header className="p-4 border-b border-[var(--color-surface-2)] bg-[var(--color-surface-1)] flex justify-between items-center">
@@ -232,7 +240,7 @@ const App: React.FC = () => {
         ) : (
             <KanbanView 
               columns={kanbanColumns}
-              tasks={filteredTasks}
+              tasks={kanbanTasks}
               teamMembers={TEAM_MEMBERS}
               onTaskStatusChange={handleTaskStatusChange}
               onWorkPackageDoubleClick={handleWorkPackageDoubleClick}

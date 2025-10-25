@@ -52,12 +52,20 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
 
   const handlePrev = () => {
+    if (activeView === 'Kanban') {
+      onCurrentDateChange(addDays(currentDate, -7));
+      return;
+    }
     if (viewLevel === 'Day') onCurrentDateChange(addDays(currentDate, -7));
     if (viewLevel === 'Week') onCurrentDateChange(addMonths(currentDate, -1));
     if (viewLevel === 'Month') onCurrentDateChange(addYears(currentDate, -1));
   };
 
   const handleNext = () => {
+    if (activeView === 'Kanban') {
+      onCurrentDateChange(addDays(currentDate, 7));
+      return;
+    }
     if (viewLevel === 'Day') onCurrentDateChange(addDays(currentDate, 7));
     if (viewLevel === 'Week') onCurrentDateChange(addMonths(currentDate, 1));
     if (viewLevel === 'Month') onCurrentDateChange(addYears(currentDate, 1));
@@ -95,23 +103,20 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           ))}
         </div>
 
-        {activeView === 'Workload' && (
-          <>
-            <button
-              onClick={handleToday}
-              className="px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--color-back)] focus:ring-[var(--color-main)] cursor-pointer"
-            >
-              {t('today')}
-            </button>
-            <div className="flex items-center gap-1">
-              <button onClick={handlePrev} className="p-2 text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] cursor-pointer"><ChevronLeftIcon /></button>
-              <button onClick={handleNext} className="p-2 text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] cursor-pointer"><ChevronRightIcon /></button>
-            </div>
-            <div className="text-lg font-semibold text-[var(--color-text-primary)] w-64 text-center">
-                {getFormattedDateRange(viewLevel, currentDate, locale)}
-            </div>
-          </>
-        )}
+        
+        <button
+          onClick={handleToday}
+          className="px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--color-back)] focus:ring-[var(--color-main)] cursor-pointer"
+        >
+          {t('today')}
+        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={handlePrev} className="p-2 text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] cursor-pointer"><ChevronLeftIcon /></button>
+          <button onClick={handleNext} className="p-2 text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] cursor-pointer"><ChevronRightIcon /></button>
+        </div>
+        <div className="text-lg font-semibold text-[var(--color-text-primary)] w-64 text-center">
+            {getFormattedDateRange(activeView === 'Kanban' ? 'Day' : viewLevel, currentDate, locale)}
+        </div>
       </div>
       
       {/* Middle: Filters (takes remaining space) */}

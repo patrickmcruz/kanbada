@@ -50,6 +50,7 @@ const resources = {
       tasks: "Tasks",
       // Default Kanban Columns
       toDo: "To Do",
+      sprint: "Sprint",
       doing: "Doing",
       done: "Done",
     }
@@ -101,6 +102,7 @@ const resources = {
       tasks: "Tarefas",
       // Default Kanban Columns
       toDo: "A Fazer",
+      sprint: "Sprint",
       doing: "Em Andamento",
       done: "Feito",
     }
