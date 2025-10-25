@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Priority, ViewLevel } from '../types';
+import type { Priority, ViewLevel, AppView } from '../types';
 import { addDays, addMonths, addYears, getFormattedDateRange } from '../utils/dateUtils';
 import { getPriorityClasses } from '../utils/styleUtils';
 import { FilterCombobox } from './FilterCombobox';
@@ -19,6 +19,8 @@ interface ToolbarProps {
   cardNameOptions: string[];
   responsibleOptions: string[];
   priorityOptions: string[];
+  activeView: AppView;
+  onActiveViewChange: (view: AppView) => void;
 }
 
 const ChevronLeftIcon = () => (
@@ -43,6 +45,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     cardNameOptions,
     responsibleOptions,
     priorityOptions,
+    activeView,
+    onActiveViewChange
 }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
@@ -75,26 +79,43 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between p-3 bg-[var(--color-surface-1)] border-b border-[var(--color-surface-2)] gap-4">
+    <div className="flex items-center justify-between p-3 bg-[var(--color-surface-1)] border-b border-[var(--color-surface-2)] gap-4 flex-wrap">
       {/* Left side: Navigation and Date */}
       <div className="flex items-center gap-4 flex-shrink-0">
-        <button
-          onClick={handleToday}
-          className="px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--color-back)] focus:ring-[var(--color-main)] cursor-pointer"
-        >
-          {t('today')}
-        </button>
-        <div className="flex items-center gap-1">
-          <button onClick={handlePrev} className="p-2 text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] cursor-pointer"><ChevronLeftIcon /></button>
-          <button onClick={handleNext} className="p-2 text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] cursor-pointer"><ChevronRightIcon /></button>
+        <div className="flex items-center bg-transparent border border-[var(--color-surface-2)] rounded-md flex-shrink-0">
+          {(['Workload', 'Kanban'] as AppView[]).map(view => (
+            <button
+              key={view}
+              onClick={() => onActiveViewChange(view)}
+              className={`px-4 py-2 text-sm font-medium border-l border-[var(--color-surface-2)] first:border-l-0 rounded-md first:rounded-r-none last:rounded-l-none cursor-pointer
+                ${activeView === view ? 'bg-[var(--color-main)] text-white' : 'text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)]'}`}
+            >
+              {t(view.toLowerCase())}
+            </button>
+          ))}
         </div>
-        <div className="text-lg font-semibold text-[var(--color-text-primary)] w-64 text-center">
-            {getFormattedDateRange(viewLevel, currentDate, locale)}
-        </div>
+
+        {activeView === 'Workload' && (
+          <>
+            <button
+              onClick={handleToday}
+              className="px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--color-back)] focus:ring-[var(--color-main)] cursor-pointer"
+            >
+              {t('today')}
+            </button>
+            <div className="flex items-center gap-1">
+              <button onClick={handlePrev} className="p-2 text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] cursor-pointer"><ChevronLeftIcon /></button>
+              <button onClick={handleNext} className="p-2 text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] cursor-pointer"><ChevronRightIcon /></button>
+            </div>
+            <div className="text-lg font-semibold text-[var(--color-text-primary)] w-64 text-center">
+                {getFormattedDateRange(viewLevel, currentDate, locale)}
+            </div>
+          </>
+        )}
       </div>
       
       {/* Middle: Filters (takes remaining space) */}
-      <div className="flex-1 flex items-center gap-2">
+      <div className="flex-1 flex items-center gap-2 min-w-[400px]">
           <FilterCombobox
             value={filterCardName}
             onChange={onFilterCardNameChange}
@@ -118,18 +139,20 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       </div>
 
       {/* Right side: View switcher */}
-      <div className="flex items-center bg-transparent border border-[var(--color-surface-2)] rounded-md flex-shrink-0">
-        {(['Day', 'Week', 'Month'] as ViewLevel[]).map(level => (
-          <button
-            key={level}
-            onClick={() => onViewLevelChange(level)}
-            className={`px-4 py-2 text-sm font-medium border-l border-[var(--color-surface-2)] first:border-l-0 rounded-md first:rounded-r-none last:rounded-l-none cursor-pointer
-              ${viewLevel === level ? 'bg-[var(--color-main)] text-white' : 'text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)]'}`}
-          >
-            {t(level.toLowerCase())}
-          </button>
-        ))}
-      </div>
+      {activeView === 'Workload' && (
+        <div className="flex items-center bg-transparent border border-[var(--color-surface-2)] rounded-md flex-shrink-0">
+          {(['Day', 'Week', 'Month'] as ViewLevel[]).map(level => (
+            <button
+              key={level}
+              onClick={() => onViewLevelChange(level)}
+              className={`px-4 py-2 text-sm font-medium border-l border-[var(--color-surface-2)] first:border-l-0 rounded-md first:rounded-r-none last:rounded-l-none cursor-pointer
+                ${viewLevel === level ? 'bg-[var(--color-main)] text-white' : 'text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)]'}`}
+            >
+              {t(level.toLowerCase())}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

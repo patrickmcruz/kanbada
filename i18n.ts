@@ -20,6 +20,8 @@ const resources = {
       clearFilter: "Clear filter",
       noOptionsFound: "No options found",
       searchInDropdown: "Search options...",
+      workload: "Workload",
+      kanban: "Kanban",
       // WorkloadView.tsx
       responsible: "Responsible",
       unassigned: "Unassigned",
@@ -29,6 +31,9 @@ const resources = {
       dark: "Dark",
       light: "Light",
       close: "Close",
+      kanbanColumns: "Kanban Columns",
+      addColumn: "Add column",
+      columnNamePlaceholder: "Column name...",
       // TaskDetailModal.tsx
       taskDetails: "Work Package Details",
       project: "Project",
@@ -43,6 +48,10 @@ const resources = {
       hours: "Hours",
       priority: "Priority",
       tasks: "Tasks",
+      // Default Kanban Columns
+      toDo: "To Do",
+      doing: "Doing",
+      done: "Done",
     }
   },
   pt: {
@@ -62,6 +71,8 @@ const resources = {
       clearFilter: "Limpar filtro",
       noOptionsFound: "Nenhuma opção encontrada",
       searchInDropdown: "Buscar opções...",
+      workload: "Carga de Trabalho",
+      kanban: "Kanban",
       // WorkloadView.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",
@@ -71,6 +82,9 @@ const resources = {
       dark: "Escuro",
       light: "Claro",
       close: "Fechar",
+      kanbanColumns: "Colunas do Kanban",
+      addColumn: "Adicionar coluna",
+      columnNamePlaceholder: "Nome da coluna...",
       // TaskDetailModal.tsx
       taskDetails: "Detalhes do Pacote de Trabalho",
       project: "Projeto",
@@ -85,6 +99,10 @@ const resources = {
       hours: "Horas",
       priority: "Prioridade",
       tasks: "Tarefas",
+      // Default Kanban Columns
+      toDo: "A Fazer",
+      doing: "Em Andamento",
+      done: "Feito",
     }
   }
 };

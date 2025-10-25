@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WorkloadView } from './components/KanbanBoard';
+import { KanbanView } from './components/KanbanView';
 import { Toolbar } from './components/Toolbar';
 import { SetupScreen } from './components/SetupScreen';
 import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { TEAM_MEMBERS } from './data/team';
 import { WORK_PACKAGES as initialWorkPackages } from './data/work-packages';
-import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage, Priority } from './types';
+import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage, Priority, AppView } from './types';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -17,8 +18,11 @@ interface SelectedWorkPackageInfo {
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
+  const [activeView, setActiveView] = useState<AppView>('Workload');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [workPackages, setWorkPackages] = useState<(ProjectWorkPackage | DemandWorkPackage)[]>(initialWorkPackages);
+  const [kanbanColumns, setKanbanColumns] = useState<string[]>([t('toDo'), t('doing'), t('done')]);
+
   const [filterCardName, setFilterCardName] = useState<string[]>([]);
   const [filterResponsible, setFilterResponsible] = useState<string[]>([]);
   const [filterPriority, setFilterPriority] = useState<string[]>([]);
@@ -30,6 +34,19 @@ const App: React.FC = () => {
     document.body.className = `theme-${theme}`;
     document.documentElement.style.colorScheme = theme;
   }, [theme]);
+  
+  // Update default Kanban columns when language changes
+  useEffect(() => {
+    setKanbanColumns(prevCols => {
+        // A simple way to check if they are default, might need improvement
+        const defaultKeys = ['toDo', 'doing', 'done'];
+        const currentDefaultTranslations = defaultKeys.map(key => t(key));
+        if (prevCols.every(col => currentDefaultTranslations.includes(col))) {
+            return [t('toDo'), t('doing'), t('done')];
+        }
+        return prevCols;
+    });
+  }, [i18n.language, t]);
 
   const allTasks = useMemo((): TaskWorkPackage[] => {
     // FIX: Add explicit type argument to flatMap to resolve type inference issue.
@@ -108,6 +125,33 @@ const App: React.FC = () => {
     setSelectedWorkPackageInfo({ task, phaseTitle: phaseTitle || 'N/A', projectTitle: projectTitle || 'N/A' });
   };
 
+  const handleTaskStatusChange = (taskId: string, newStatus: string) => {
+    const updatedWorkPackages = workPackages.map(container => {
+        const updateTasks = (tasks: TaskWorkPackage[]) => tasks.map(task => 
+            task.id === taskId ? { ...task, status: newStatus } : task
+        );
+
+        if (container.type === 'Project') {
+            return {
+                ...container,
+                phases: container.phases.map(phase => ({
+                    ...phase,
+                    tasks: updateTasks(phase.tasks)
+                }))
+            };
+        }
+        if (container.type === 'Demand') {
+            return {
+                ...container,
+                tasks: updateTasks(container.tasks)
+            };
+        }
+        return container;
+    });
+    setWorkPackages(updatedWorkPackages);
+  };
+
+
   const filteredTasks = useMemo(() => {
     const responsibleMap = new Map(TEAM_MEMBERS.map(member => [member.id, member.name]));
 
@@ -160,6 +204,8 @@ const App: React.FC = () => {
         </div>
       </header>
       <Toolbar
+        activeView={activeView}
+        onActiveViewChange={setActiveView}
         viewLevel={viewLevel}
         onViewLevelChange={setViewLevel}
         currentDate={currentDate}
@@ -175,13 +221,23 @@ const App: React.FC = () => {
         priorityOptions={priorityOptions}
       />
       <main className="flex-1 overflow-auto p-4">
-        <WorkloadView
-          viewLevel={viewLevel}
-          currentDate={currentDate}
-          workPackages={filteredTasks}
-          teamMembers={TEAM_MEMBERS}
-          onWorkPackageDoubleClick={handleWorkPackageDoubleClick}
-        />
+        {activeView === 'Workload' ? (
+            <WorkloadView
+              viewLevel={viewLevel}
+              currentDate={currentDate}
+              workPackages={filteredTasks}
+              teamMembers={TEAM_MEMBERS}
+              onWorkPackageDoubleClick={handleWorkPackageDoubleClick}
+            />
+        ) : (
+            <KanbanView 
+              columns={kanbanColumns}
+              tasks={filteredTasks}
+              teamMembers={TEAM_MEMBERS}
+              onTaskStatusChange={handleTaskStatusChange}
+              onWorkPackageDoubleClick={handleWorkPackageDoubleClick}
+            />
+        )}
       </main>
       {isSetupOpen && (
         <SetupScreen
@@ -190,6 +246,8 @@ const App: React.FC = () => {
           onChangeTheme={setTheme}
           currentLang={i18n.language}
           onChangeLang={changeLanguage}
+          kanbanColumns={kanbanColumns}
+          onChangeKanbanColumns={setKanbanColumns}
         />
       )}
       {selectedWorkPackageInfo && (

@@ -1,6 +1,7 @@
 
 
 export type ViewLevel = 'Day' | 'Week' | 'Month';
+export type AppView = 'Workload' | 'Kanban';
 
 export interface TeamMember {
   id: string;
@@ -12,7 +13,7 @@ export type Priority = 'Urgente' | 'Alta' | 'Média' | 'Baixa';
 
 // Base interface for all work packages
 interface WorkPackageBase {
-  id: string;
+  id:string;
   title: string;
   startDate: Date;
   endDate: Date;
@@ -46,6 +47,7 @@ export interface TaskWorkPackage extends WorkPackageBase {
   ownerId: string | null; // null for unassigned
   isDemand?: boolean; // For special styling
   priority?: Priority;
+  status: string; // New field for Kanban status
 }
 
 export type WorkPackage = ProjectWorkPackage | DemandWorkPackage | PhaseWorkPackage | TaskWorkPackage;
