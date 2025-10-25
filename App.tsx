@@ -7,7 +7,7 @@ import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { FilterModal } from './components/FilterModal';
 import { TEAM_MEMBERS } from './data/team';
 import { WORK_PACKAGES as initialWorkPackages } from './data/work-packages';
-import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, Filters } from './types';
+import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage, Filters } from './types';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -19,8 +19,7 @@ const App: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [workPackages, setWorkPackages] = useState<ProjectWorkPackage[]>(initialWorkPackages);
-  const [justUpdatedWorkPackageId, setJustUpdatedWorkPackageId] = useState<string | null>(null);
+  const [workPackages, setWorkPackages] = useState<(ProjectWorkPackage | DemandWorkPackage)[]>(initialWorkPackages);
   const [filterText, setFilterText] = useState<string>('');
   const [advancedFilters, setAdvancedFilters] = useState<Filters>({ responsibles: [], priorities: [] });
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -34,28 +33,24 @@ const App: React.FC = () => {
   }, [theme]);
 
   const allTasks = useMemo((): TaskWorkPackage[] => {
-    return workPackages.flatMap(project => 
-        project.phases.flatMap(phase => phase.tasks)
-    );
-  }, [workPackages]);
-
-  const handleWorkPackageUpdate = (updatedWorkPackage: TaskWorkPackage) => {
-    setWorkPackages(prevProjects => {
-        return prevProjects.map(project => ({
-            ...project,
-            phases: project.phases.map(phase => ({
-                ...phase,
-                tasks: phase.tasks.map(task => 
-                    task.id === updatedWorkPackage.id ? updatedWorkPackage : task
-                )
-            }))
+    // FIX: Add explicit type argument to flatMap to resolve type inference issue.
+    return workPackages.flatMap<TaskWorkPackage>(container => {
+      if (container.type === 'Project') {
+        return container.phases.flatMap(phase =>
+          phase.tasks.map(task => ({
+            ...task,
+            isDemand: false
+          }))
+        );
+      } else if (container.type === 'Demand') {
+        return container.tasks.map(task => ({
+          ...task,
+          isDemand: true
         }));
+      }
+      return [];
     });
-    setJustUpdatedWorkPackageId(updatedWorkPackage.id);
-    setTimeout(() => {
-        setJustUpdatedWorkPackageId(null);
-    }, 500); // Reset after animation duration
-  };
+  }, [workPackages]);
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -73,21 +68,30 @@ const App: React.FC = () => {
   const isAdvancedFilterActive = advancedFilters.responsibles.length > 0 || advancedFilters.priorities.length > 0;
 
   const handleWorkPackageDoubleClick = (task: TaskWorkPackage) => {
-    let phaseTitle = 'N/A';
-    let projectTitle = 'N/A';
-    
-    for (const project of workPackages) {
-      for (const phase of project.phases) {
-        if (phase.tasks.some(t => t.id === task.id)) {
-          phaseTitle = phase.title;
-          projectTitle = project.title;
-          break;
+    let phaseTitle = '';
+    let projectTitle = '';
+
+    const container = workPackages.find(p => {
+        if (p.type === 'Project') {
+            return p.phases.some(ph => ph.tasks.some(t => t.id === task.id));
+        } else { // Demand
+            return p.tasks.some(t => t.id === task.id);
         }
-      }
-      if (projectTitle !== 'N/A') break;
+    });
+
+    if (container) {
+        projectTitle = container.title;
+        if (container.type === 'Project') {
+            const phase = container.phases.find(ph => ph.tasks.some(t => t.id === task.id));
+            if (phase) {
+                phaseTitle = phase.title;
+            }
+        } else {
+            phaseTitle = t('tasks'); // Using the new translation key
+        }
     }
     
-    setSelectedWorkPackageInfo({ task, phaseTitle, projectTitle });
+    setSelectedWorkPackageInfo({ task, phaseTitle: phaseTitle || 'N/A', projectTitle: projectTitle || 'N/A' });
   };
 
   const filteredTasks = useMemo(() => {
@@ -129,7 +133,7 @@ const App: React.FC = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsSetupOpen(true)}
-            className={`p-2 rounded-full transition-colors ${
+            className={`p-2 rounded-full transition-colors cursor-pointer ${
               isSetupOpen
                 ? 'bg-[var(--color-main)] text-white'
                 : 'text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)]'
@@ -167,8 +171,6 @@ const App: React.FC = () => {
           currentDate={currentDate}
           workPackages={filteredTasks}
           teamMembers={TEAM_MEMBERS}
-          onWorkPackageUpdate={handleWorkPackageUpdate}
-          justUpdatedWorkPackageId={justUpdatedWorkPackageId}
           onWorkPackageDoubleClick={handleWorkPackageDoubleClick}
         />
       </main>

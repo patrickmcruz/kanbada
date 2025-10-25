@@ -41,6 +41,7 @@ const resources = {
       days: "days",
       hours: "Hours",
       priority: "Priority",
+      tasks: "Tasks",
     }
   },
   pt: {
@@ -81,6 +82,7 @@ const resources = {
       days: "dias",
       hours: "Horas",
       priority: "Prioridade",
+      tasks: "Tarefas",
     }
   }
 };

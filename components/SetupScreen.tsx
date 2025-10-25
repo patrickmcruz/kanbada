@@ -32,7 +32,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
           <h2 id="setup-title" className="text-xl font-bold">{t('setup')}</h2>
           <button 
             onClick={onClose} 
-            className="p-1 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)]"
+            className="p-1 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)] cursor-pointer"
             aria-label={t('close')}
           >
             <XIcon />
@@ -46,14 +46,14 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
             <div className="flex gap-4">
               <button
                 onClick={() => onChangeTheme('dark')}
-                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors ${currentTheme === 'dark' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
+                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${currentTheme === 'dark' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
                 aria-pressed={currentTheme === 'dark'}
               >
                 {t('dark')}
               </button>
               <button
                 onClick={() => onChangeTheme('light')}
-                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors ${currentTheme === 'light' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
+                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${currentTheme === 'light' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
                 aria-pressed={currentTheme === 'light'}
               >
                 {t('light')}
@@ -67,14 +67,14 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
             <div className="flex gap-4">
               <button
                 onClick={() => onChangeLang('en')}
-                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors ${currentLang === 'en' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
+                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${currentLang === 'en' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
                 aria-pressed={currentLang === 'en'}
               >
                 EN
               </button>
               <button
                 onClick={() => onChangeLang('pt')}
-                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors ${currentLang.startsWith('pt') ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
+                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${currentLang.startsWith('pt') ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
                 aria-pressed={currentLang.startsWith('pt')}
               >
                 PT

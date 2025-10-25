@@ -1,4 +1,4 @@
-import type { ProjectWorkPackage } from '../types';
+import type { ProjectWorkPackage, DemandWorkPackage } from '../types';
 import { addDays, getStartOfWeek } from '../utils/dateUtils';
 
 const today = new Date();
@@ -10,7 +10,7 @@ while (firstMondayOfOctober.getDay() !== 1) { // 1 = Monday
   firstMondayOfOctober.setDate(firstMondayOfOctober.getDate() + 1);
 }
 
-export const WORK_PACKAGES: ProjectWorkPackage[] = [
+export const WORK_PACKAGES: (ProjectWorkPackage | DemandWorkPackage)[] = [
   {
     id: 'proj-1',
     type: 'Project',
@@ -55,35 +55,23 @@ export const WORK_PACKAGES: ProjectWorkPackage[] = [
     ],
   },
   {
-    id: 'proj-2',
-    type: 'Project',
-    title: 'Demandas',
+    id: 'demand-1',
+    type: 'Demand',
+    title: 'DAN1',
     startDate: startOfWeek,
     endDate: addDays(startOfWeek, 1),
-    phases: [
+    tasks: [
         {
-            id: 'phase-2-1',
-            type: 'Phase',
-            projectId: 'proj-2',
-            title: 'Demandas Urgentes',
+            id: 'task-2',
+            type: 'Task',
+            projectId: 'DAN1',
+            title: 'Título demanda 01',
+            hours: 40,
+            ownerId: 'pietrinho',
             startDate: startOfWeek,
             endDate: addDays(startOfWeek, 1),
-            tasks: [
-                {
-                    id: 'task-2',
-                    type: 'Task',
-                    phaseId: 'phase-2-1',
-                    projectId: 'DAN1',
-                    title: 'Título demanda 01',
-                    hours: 40,
-                    ownerId: 'pietrinho',
-                    startDate: startOfWeek,
-                    endDate: addDays(startOfWeek, 1),
-                    isDemand: true,
-                    priority: 'Urgente',
-                  },
-            ]
-        }
+            priority: 'Urgente',
+          },
     ]
   },
   {

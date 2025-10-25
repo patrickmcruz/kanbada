@@ -31,7 +31,7 @@ export const WorkPackageCard: React.FC<WorkPackageCardProps> = ({ workPackage, m
   return (
     <div
       onDoubleClick={() => onDoubleClick(workPackage)}
-      className={`h-full w-full rounded-md flex items-center hover:brightness-110 transition-all duration-200 ${cardBg} border-l-4 ${borderColor} ${isCompact ? 'p-1' : 'p-2'}`}
+      className={`h-full w-full rounded-md flex items-center hover:brightness-110 transition-all duration-200 ${cardBg} border-l-4 ${borderColor} ${isCompact ? 'p-1' : 'p-2'} cursor-pointer`}
     >
       <div className="flex justify-between items-start w-full gap-2">
         <p className={`font-bold text-[var(--color-text-primary)] ${isCompact ? 'text-[10px] leading-tight' : 'text-xs'}`}>

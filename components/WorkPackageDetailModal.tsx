@@ -68,7 +68,7 @@ export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ 
           <h2 className="text-xl font-bold">{t('taskDetails')}</h2>
           <button 
             onClick={onClose} 
-            className="p-1 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)]"
+            className="p-1 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)] cursor-pointer"
             aria-label={t('close')}
           >
             <XIcon />

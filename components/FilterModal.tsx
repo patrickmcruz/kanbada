@@ -62,7 +62,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({ onClose, onApply, curr
           <h2 id="filter-title" className="text-xl font-bold">{t('advancedFilters')}</h2>
           <button 
             onClick={onClose} 
-            className="p-1 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)]"
+            className="p-1 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)] cursor-pointer"
             aria-label={t('close')}
           >
             <XIcon />
@@ -109,13 +109,13 @@ export const FilterModal: React.FC<FilterModalProps> = ({ onClose, onApply, curr
         <footer className="flex-shrink-0 flex items-center justify-end gap-4 p-4 border-t border-[var(--color-surface-2)]">
             <button
                 onClick={handleClear}
-                className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+                className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] cursor-pointer"
             >
                 {t('clearFilters')}
             </button>
             <button
                 onClick={handleApply}
-                className="px-6 py-2 text-sm font-semibold text-white bg-[var(--color-main)] rounded-md hover:brightness-110"
+                className="px-6 py-2 text-sm font-semibold text-white bg-[var(--color-main)] rounded-md hover:brightness-110 cursor-pointer"
             >
                 {t('applyFilters')}
             </button>

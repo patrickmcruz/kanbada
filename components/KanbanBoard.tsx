@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TaskWorkPackage, TeamMember, ViewLevel } from '../types';
-import { generateDateColumns, daysBetween, addDays, getStartOfDay } from '../utils/dateUtils';
+import { generateDateColumns, getStartOfDay } from '../utils/dateUtils';
 import { WorkPackageCard } from './WorkPackageCard';
 
 interface KanbanBoardProps {
@@ -9,17 +9,13 @@ interface KanbanBoardProps {
   currentDate: Date;
   workPackages: TaskWorkPackage[];
   teamMembers: TeamMember[];
-  onWorkPackageUpdate: (workPackage: TaskWorkPackage) => void;
-  justUpdatedWorkPackageId: string | null;
   onWorkPackageDoubleClick: (workPackage: TaskWorkPackage) => void;
 }
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageUpdate, justUpdatedWorkPackageId, onWorkPackageDoubleClick }) => {
+export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageDoubleClick }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
   const dateColumns = generateDateColumns(viewLevel, currentDate, locale);
-  
-  const [draggedWorkPackageId, setDraggedWorkPackageId] = useState<string | null>(null);
 
   const allMembers = useMemo(() => 
     [...teamMembers.filter(m => m.id !== 'unassigned'), ...teamMembers.filter(m => m.id === 'unassigned')],
@@ -123,43 +119,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
     };
   };
 
-  const handleDragStart = (e: React.DragEvent, workPackage: TaskWorkPackage) => {
-    e.dataTransfer.setData('workPackageId', workPackage.id);
-    e.dataTransfer.effectAllowed = 'move';
-    setTimeout(() => {
-        setDraggedWorkPackageId(workPackage.id);
-    }, 0);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedWorkPackageId(null);
-  };
-
-  const handleDragOver = (e: React.DragEvent, rowIndex: number) => {
-    if (!draggedWorkPackageId) return;
-    const workPackage = workPackages.find(t => t.id === draggedWorkPackageId);
-    if (!workPackage) return;
-    const taskOwnerId = workPackage.ownerId ?? 'unassigned';
-    const dropRowOwnerId = allMembers[rowIndex].id;
-    if (taskOwnerId === dropRowOwnerId) {
-        e.preventDefault();
-    }
-  };
-  
-  const handleDrop = (e: React.DragEvent, colIndex: number) => {
-    e.preventDefault();
-    const workPackageId = e.dataTransfer.getData('workPackageId');
-    if (!workPackageId) return;
-    const originalWorkPackage = workPackages.find(t => t.id === workPackageId);
-    if (!originalWorkPackage) return;
-    const targetColumn = dateColumns[colIndex];
-    const duration = daysBetween(originalWorkPackage.startDate, originalWorkPackage.endDate);
-    const newStartDate = targetColumn.startDate;
-    const newEndDate = addDays(newStartDate, duration - 1);
-    const updatedWorkPackage: TaskWorkPackage = { ...originalWorkPackage, startDate: newStartDate, endDate: newEndDate };
-    onWorkPackageUpdate(updatedWorkPackage);
-  };
-
   const timelineGridTemplateColumns = `repeat(${dateColumns.length}, minmax(120px, 2fr))`;
 
   return (
@@ -177,7 +136,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
         </div>
 
         {/* --- Right Column: Timeline (scrollable) --- */}
-        <div className={`flex-1 overflow-auto ${draggedWorkPackageId ? 'is-dragging' : ''}`}>
+        <div className="flex-1 overflow-auto">
             <div
                 className="grid relative"
                 style={{
@@ -192,20 +151,18 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
                     </div>
                 ))}
                 
-                {/* Rows with Drop Cells and Tasks */}
+                {/* Rows with Cells and Tasks */}
                 {allMembers.map((member, rowIndex) => (
                     <div
                         key={member.id}
                         className="contents" // This makes the div not affect the grid layout itself
                     >
-                        {/* Drop Cells */}
+                        {/* Cells */}
                         {dateColumns.map((_, colIndex) => (
                             <div
                                 key={colIndex}
                                 style={{ gridRow: rowIndex + 2, gridColumn: colIndex + 1 }}
-                                className="drop-cell border-b border-r border-[var(--color-surface-2)] last:border-r-0 min-h-[80px] transition-colors duration-150"
-                                onDragOver={(e) => handleDragOver(e, rowIndex)}
-                                onDrop={(e) => handleDrop(e, colIndex)}
+                                className="border-b border-r border-[var(--color-surface-2)] last:border-r-0 min-h-[80px]"
                             ></div>
                         ))}
 
@@ -229,18 +186,12 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
                                     style.top = `calc(${topOffsetPercentage}% + 2px)`;
                                     style.zIndex = stackIndex;
                                 }
-                                
-                                const isDraggable = workPackage.ownerId !== null;
-                                const wasJustUpdated = workPackage.id === justUpdatedWorkPackageId;
 
                                 return (
                                     <div 
                                         key={workPackage.id} 
                                         style={style} 
-                                        className={`p-1 z-10 transition-all duration-300 ease-in-out ${isDraggable ? 'cursor-grab' : ''} ${draggedWorkPackageId === workPackage.id ? 'invisible' : (draggedWorkPackageId ? 'pointer-events-none' : '')} ${wasJustUpdated ? 'animate-drop' : ''}`}
-                                        draggable={isDraggable}
-                                        onDragStart={isDraggable ? (e) => handleDragStart(e, workPackage) : undefined}
-                                        onDragEnd={isDraggable ? handleDragEnd : undefined}
+                                        className="p-1 z-10"
                                     >
                                         <WorkPackageCard 
                                             workPackage={workPackage} 
