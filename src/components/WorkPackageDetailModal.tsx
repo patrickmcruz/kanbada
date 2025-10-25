@@ -87,7 +87,6 @@ export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ 
                 <DetailRow label={t('startDate')} value={formatDate(workPackage.startDate)} />
                 <DetailRow label={t('endDate')} value={formatDate(workPackage.endDate)} />
 
-                {/* FIX: Use 'day_singular' to resolve translation key conflict. */}
                 <DetailRow label={t('duration')} value={`${duration} ${duration > 1 ? t('days') : t('day_singular')}`} />
                 <DetailRow label={t('hours')} value={`${workPackage.hours}h`} />
             </dl>

@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TaskWorkPackage, TeamMember, ViewLevel } from '../types';
 import { generateDateColumns, getStartOfDay } from '../utils/dateUtils';
-import { WorkPackageCard } from './WorkPackageCard';
+import { WorkPackageCard } from '../components/WorkPackageCard';
 
 interface WorkloadViewProps {
   viewLevel: ViewLevel;
