@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KanbanBoard } from './components/KanbanBoard';
+import { WorkloadView } from './components/KanbanBoard';
 import { Toolbar } from './components/Toolbar';
 import { SetupScreen } from './components/SetupScreen';
 import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
@@ -130,7 +130,7 @@ const App: React.FC = () => {
     <div className="flex flex-col h-screen font-sans bg-[var(--color-back)] text-[var(--color-text-primary)]">
       <header className="p-4 border-b border-[var(--color-surface-2)] bg-[var(--color-surface-1)] flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">{t('kanbanMatrix')}</h1>
+          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">{t('workloadView')}</h1>
           <p className="text-sm text-[var(--color-text-secondary)]">{t('teamActivityOverview')}</p>
         </div>
         <div className="flex items-center gap-4">
@@ -175,7 +175,7 @@ const App: React.FC = () => {
         priorityOptions={priorityOptions}
       />
       <main className="flex-1 overflow-auto p-4">
-        <KanbanBoard
+        <WorkloadView
           viewLevel={viewLevel}
           currentDate={currentDate}
           workPackages={filteredTasks}

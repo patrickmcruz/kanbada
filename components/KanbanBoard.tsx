@@ -4,7 +4,7 @@ import type { TaskWorkPackage, TeamMember, ViewLevel } from '../types';
 import { generateDateColumns, getStartOfDay } from '../utils/dateUtils';
 import { WorkPackageCard } from './WorkPackageCard';
 
-interface KanbanBoardProps {
+interface WorkloadViewProps {
   viewLevel: ViewLevel;
   currentDate: Date;
   workPackages: TaskWorkPackage[];
@@ -30,7 +30,7 @@ const getColorForId = (id: string) => {
 const getInitials = (name: string) => name.charAt(0).toUpperCase();
 // --- End of helper functions ---
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageDoubleClick }) => {
+export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageDoubleClick }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
   const dateColumns = generateDateColumns(viewLevel, currentDate, locale);

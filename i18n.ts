@@ -6,7 +6,7 @@ const resources = {
   en: {
     translation: {
       // App.tsx
-      kanbanMatrix: "Kanban Matrix",
+      workloadView: "Workload View",
       teamActivityOverview: "Team Activity Overview",
       setup: "Setup",
       // Toolbar.tsx
@@ -20,7 +20,7 @@ const resources = {
       clearFilter: "Clear filter",
       noOptionsFound: "No options found",
       searchInDropdown: "Search options...",
-      // KanbanBoard.tsx
+      // WorkloadView.tsx
       responsible: "Responsible",
       unassigned: "Unassigned",
       // SetupScreen.tsx
@@ -48,7 +48,7 @@ const resources = {
   pt: {
     translation: {
       // App.tsx
-      kanbanMatrix: "Matriz Kanban",
+      workloadView: "Visão de Carga de Trabalho",
       teamActivityOverview: "Visão Geral da Atividade da Equipe",
       setup: "Configurações",
       // Toolbar.tsx
@@ -62,7 +62,7 @@ const resources = {
       clearFilter: "Limpar filtro",
       noOptionsFound: "Nenhuma opção encontrada",
       searchInDropdown: "Buscar opções...",
-      // KanbanBoard.tsx
+      // WorkloadView.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",
       // SetupScreen.tsx
