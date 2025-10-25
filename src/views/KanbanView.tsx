@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TaskWorkPackage, TeamMember } from '../types';
+import type { TaskWorkPackage, TeamMember, Priority } from '../types';
 import { getPriorityClasses } from '../utils/styleUtils';
 
 
@@ -100,6 +100,13 @@ const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId
     );
 };
 
+const priorityOrder: Record<Priority, number> = {
+  'Urgente': 1,
+  'Alta': 2,
+  'Média': 3,
+  'Baixa': 4,
+};
+
 
 export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMembers, onTaskStatusChange }) => {
   const { t } = useTranslation();
@@ -143,7 +150,13 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
         onDragEnd={handleDragEnd}
     >
       {columns.map(column => {
-        const tasksInColumn = tasks.filter(task => task.status === column);
+        const tasksInColumn = tasks
+            .filter(task => task.status === column)
+            .sort((a, b) => {
+                const priorityValueA = a.priority ? priorityOrder[a.priority] : Infinity;
+                const priorityValueB = b.priority ? priorityOrder[b.priority] : Infinity;
+                return priorityValueA - priorityValueB;
+            });
         const totalHours = tasksInColumn.reduce((sum, task) => sum + task.hours, 0);
 
         return (
