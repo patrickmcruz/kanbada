@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TaskWorkPackage, TeamMember, ViewLevel } from '../types';
 import { generateDateColumns, getStartOfDay } from '../utils/dateUtils';
@@ -34,6 +34,37 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
   const dateColumns = generateDateColumns(viewLevel, currentDate, locale);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // When the view changes to 'Month', scroll the current month into the center of the view.
+    if (viewLevel === 'Month' && scrollContainerRef.current) {
+        const currentMonthIndex = currentDate.getMonth();
+        const container = scrollContainerRef.current;
+        const grid = container.querySelector(':scope > div.grid') as HTMLElement;
+
+        if (grid && grid.children.length >= dateColumns.length) {
+            const targetColumn = grid.children[currentMonthIndex] as HTMLElement;
+
+            if (targetColumn) {
+                const containerWidth = container.offsetWidth;
+                const targetOffsetLeft = targetColumn.offsetLeft;
+                const targetWidth = targetColumn.offsetWidth;
+
+                // Calculate the scroll position to center the target column
+                const scrollLeft = targetOffsetLeft - (containerWidth / 2) + (targetWidth / 2);
+
+                container.scrollTo({
+                    left: scrollLeft,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    } else if (scrollContainerRef.current) {
+        // For other views, reset scroll to the beginning.
+        scrollContainerRef.current.scrollTo({ left: 0, behavior: 'auto' });
+    }
+  }, [viewLevel, currentDate, dateColumns]);
 
   const allMembers = useMemo(() => 
     [...teamMembers.filter(m => m.id !== 'unassigned'), ...teamMembers.filter(m => m.id === 'unassigned')],
@@ -137,14 +168,15 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
     };
   };
 
-  const timelineGridTemplateColumns = `repeat(${dateColumns.length}, minmax(120px, 2fr))`;
+  const timelineGridTemplateColumns = `repeat(${dateColumns.length}, minmax(180px, 2fr))`;
 
   return (
     <div className="bg-[var(--color-surface-1)] rounded-lg overflow-hidden border border-[var(--color-surface-2)] flex h-full">
         {/* --- Left Column: Responsible --- */}
         <div className="flex-shrink-0 z-10 border-r border-[var(--color-surface-2)]" style={{ width: '150px' }}>
-            <div className="p-4 font-bold text-xs text-center uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-[var(--color-surface-2)] sticky top-0">
-                {t('responsible')}
+            <div className="p-4 font-bold text-xs text-left uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-[var(--color-surface-2)] sticky top-0 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>{t('responsible')}</span>
             </div>
             {allMembers.map((member) => {
                 if (member.id === 'unassigned') {
@@ -170,7 +202,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
         </div>
 
         {/* --- Right Column: Timeline (scrollable) --- */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto" ref={scrollContainerRef}>
             <div
                 className="grid relative"
                 style={{

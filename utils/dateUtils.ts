@@ -53,10 +53,12 @@ export const generateDateColumns = (viewLevel: ViewLevel, currentDate: Date, loc
             const startOfWeek = getStartOfWeek(currentDate);
             for (let i = 0; i < 5; i++) { // Monday to Friday
                 const day = addDays(startOfWeek, i);
+                const weekday = day.toLocaleDateString(locale, { weekday: 'long' }).toUpperCase();
+                const dayOfMonth = day.getDate();
                 columns.push({
                     startDate: day,
                     endDate: day,
-                    label: day.toLocaleDateString(locale, { weekday: 'short', day: 'numeric' })
+                    label: `${weekday}, ${dayOfMonth}`
                 });
             }
             break;
@@ -73,10 +75,20 @@ export const generateDateColumns = (viewLevel: ViewLevel, currentDate: Date, loc
 
             for (let i = 0; i < 5; i++) { // Show 5 weeks
                 const endOfWeek = addDays(current, 6);
+                
+                const startMonth = current.toLocaleDateString(locale, { month: 'short' });
+                const endMonth = endOfWeek.toLocaleDateString(locale, { month: 'short' });
+                let weekLabel = '';
+                if (startMonth === endMonth) {
+                    weekLabel = `${current.getDate()} - ${endOfWeek.getDate()} ${startMonth}`;
+                } else {
+                    weekLabel = `${current.getDate()} ${startMonth} - ${endOfWeek.getDate()} ${endMonth}`;
+                }
+
                 columns.push({
                     startDate: current,
                     endDate: endOfWeek,
-                    label: `W${i+1} (${current.getDate()} - ${endOfWeek.getDate()})`
+                    label: `W${i+1} (${weekLabel})`
                 });
                 current = addDays(current, 7);
             }
