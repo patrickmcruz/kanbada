@@ -14,8 +14,8 @@ const resources = {
       day: "Day",
       week: "Week",
       month: "Month",
-      filterPlaceholder: "Search by responsible, project, or title...",
       all: "All",
+      filterPlaceholder: "Filter by card name or project...",
       // KanbanBoard.tsx
       responsible: "Responsible",
       unassigned: "Unassigned",
@@ -28,6 +28,10 @@ const resources = {
       advancedFilters: "Advanced Filters",
       applyFilters: "Apply Filters",
       clearFilters: "Clear Filters",
+      clearSelection: "Clear",
+      cardName: "Card Name",
+      searchInDropdown: "Search options...",
+      noOptionsFound: "No options found.",
       // TaskDetailModal.tsx
       taskDetails: "Work Package Details",
       project: "Project",
@@ -55,8 +59,8 @@ const resources = {
       day: "Dia",
       week: "Semana",
       month: "Mês",
-      filterPlaceholder: "Buscar por responsável, projeto ou título...",
       all: "Todos",
+      filterPlaceholder: "Filtrar por nome do card ou projeto...",
       // KanbanBoard.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",
@@ -69,6 +73,10 @@ const resources = {
       advancedFilters: "Filtros Avançados",
       applyFilters: "Aplicar Filtros",
       clearFilters: "Limpar Filtros",
+      clearSelection: "Limpar",
+      cardName: "Nome do Card",
+      searchInDropdown: "Buscar opções...",
+      noOptionsFound: "Nenhuma opção encontrada.",
       // TaskDetailModal.tsx
       taskDetails: "Detalhes do Pacote de Trabalho",
       project: "Projeto",

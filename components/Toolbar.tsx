@@ -8,10 +8,10 @@ interface ToolbarProps {
   onViewLevelChange: (level: ViewLevel) => void;
   currentDate: Date;
   onCurrentDateChange: (date: Date) => void;
-  filterText: string;
-  onFilterChange: (value: string) => void;
   onOpenFilterModal: () => void;
-  isAdvancedFilterActive: boolean;
+  isFilterActive: boolean;
+  filterText: string;
+  onFilterTextChange: (text: string) => void;
 }
 
 const ChevronLeftIcon = () => (
@@ -23,6 +23,9 @@ const ChevronRightIcon = () => (
 const FilterIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
 );
+const SearchIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-text-secondary)]"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+);
 
 
 export const Toolbar: React.FC<ToolbarProps> = ({ 
@@ -30,14 +33,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     onViewLevelChange, 
     currentDate, 
     onCurrentDateChange,
-    filterText,
-    onFilterChange,
     onOpenFilterModal,
-    isAdvancedFilterActive,
+    isFilterActive,
+    filterText,
+    onFilterTextChange
 }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
-  const isFiltered = filterText.length > 0;
 
   const handlePrev = () => {
     if (viewLevel === 'Day') onCurrentDateChange(addDays(currentDate, -7));
@@ -72,22 +74,25 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             {getFormattedDateRange(viewLevel, currentDate, locale)}
         </div>
          <div className="flex items-center gap-2 border-l border-[var(--color-surface-2)] pl-4">
-            <input
-              type="text"
-              id="search-filter"
-              placeholder={t('filterPlaceholder') as string}
-              value={filterText}
-              onChange={(e) => onFilterChange(e.target.value)}
-              className={`block w-80 pl-3 pr-3 py-2 text-sm bg-[var(--color-surface-2)] border border-[var(--color-surface-3)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none rounded-md transition-shadow ${isFiltered ? 'ring-2 ring-inset ring-[var(--color-main)]' : 'focus:ring-2 focus:ring-inset focus:ring-[var(--color-surface-3)]'}`}
-              aria-label={t('filterPlaceholder') as string}
-            />
+            <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <SearchIcon />
+                </span>
+                <input
+                    type="text"
+                    placeholder={t('filterPlaceholder') as string}
+                    value={filterText}
+                    onChange={(e) => onFilterTextChange(e.target.value)}
+                    className="w-80 rounded-md border border-[var(--color-surface-3)] bg-[var(--color-surface-2)] py-2 pl-10 pr-4 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
+                />
+            </div>
             <button
                 onClick={onOpenFilterModal}
                 className="relative p-2 text-sm font-medium text-[var(--color-text-primary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--color-back)] focus:ring-[var(--color-main)] cursor-pointer"
                 aria-label={t('advancedFilters') as string}
             >
                 <FilterIcon />
-                {isAdvancedFilterActive && (
+                {isFilterActive && (
                     <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-[var(--color-surface-1)]" />
                 )}
             </button>

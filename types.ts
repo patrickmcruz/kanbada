@@ -12,6 +12,7 @@ export type Priority = 'Urgente' | 'Alta' | 'Média' | 'Baixa';
 
 // Interface for advanced filters
 export interface Filters {
+  titles: string[];
   responsibles: string[];
   priorities: Priority[];
 }

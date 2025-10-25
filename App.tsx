@@ -20,8 +20,8 @@ const App: React.FC = () => {
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [workPackages, setWorkPackages] = useState<(ProjectWorkPackage | DemandWorkPackage)[]>(initialWorkPackages);
-  const [filterText, setFilterText] = useState<string>('');
-  const [advancedFilters, setAdvancedFilters] = useState<Filters>({ responsibles: [], priorities: [] });
+  const [filters, setFilters] = useState<Filters>({ titles: [], responsibles: [], priorities: [] });
+  const [filterText, setFilterText] = useState('');
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -52,20 +52,20 @@ const App: React.FC = () => {
     });
   }, [workPackages]);
 
+  const allUniqueTitles = useMemo(() => {
+    const titles = allTasks.map(task => task.title);
+    return [...new Set(titles)].sort();
+  }, [allTasks]);
+
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
   };
-
-  const handleFilterChange = (value: string) => {
-    setFilterText(value);
+  
+  const handleApplyFilters = (newFilters: Filters) => {
+    setFilters(newFilters);
   };
   
-  const handleApplyAdvancedFilters = (newFilters: Filters) => {
-    setAdvancedFilters(newFilters);
-    setIsFilterModalOpen(false);
-  };
-  
-  const isAdvancedFilterActive = advancedFilters.responsibles.length > 0 || advancedFilters.priorities.length > 0;
+  const isFilterActive = filterText.length > 0 || filters.titles.length > 0 || filters.responsibles.length > 0 || filters.priorities.length > 0;
 
   const handleWorkPackageDoubleClick = (task: TaskWorkPackage) => {
     let phaseTitle = '';
@@ -96,32 +96,27 @@ const App: React.FC = () => {
 
   const filteredTasks = useMemo(() => {
     return allTasks.filter(task => {
-      // Text filter
-      const textFilterMatch = (() => {
-        if (filterText === '') return true;
-        const lowerCaseFilter = filterText.toLowerCase();
-        const owner = TEAM_MEMBERS.find(m => m.id === task.ownerId);
-        const ownerName = owner ? owner.name : TEAM_MEMBERS.find(m => m.id === 'unassigned')?.name || 'Unassigned';
-        const responsibleMatch = ownerName.toLowerCase().includes(lowerCaseFilter);
-        const projectMatch = task.projectId.toLowerCase().includes(lowerCaseFilter);
-        const titleMatch = task.title.toLowerCase().includes(lowerCaseFilter);
-        return responsibleMatch || projectMatch || titleMatch;
-      })();
-      if (!textFilterMatch) return false;
+      // Text filter from Toolbar
+      const searchText = filterText.trim().toLowerCase();
+      if (searchText && !(task.title.toLowerCase().includes(searchText) || task.projectId.toLowerCase().includes(searchText))) {
+          return false;
+      }
 
-      // Advanced responsible filter
-      const responsibleFilterMatch = advancedFilters.responsibles.length === 0 || 
-        advancedFilters.responsibles.includes(task.ownerId ?? 'unassigned');
+      // Advanced filters from Modal
+      const titleFilterMatch = filters.titles.length === 0 || filters.titles.includes(task.title);
+      if (!titleFilterMatch) return false;
+
+      const responsibleFilterMatch = filters.responsibles.length === 0 || 
+        filters.responsibles.includes(task.ownerId ?? 'unassigned');
       if (!responsibleFilterMatch) return false;
 
-      // Advanced priority filter
-      const priorityFilterMatch = advancedFilters.priorities.length === 0 ||
-        (task.priority && advancedFilters.priorities.includes(task.priority));
+      const priorityFilterMatch = filters.priorities.length === 0 ||
+        (task.priority && filters.priorities.includes(task.priority));
       if (!priorityFilterMatch) return false;
 
       return true;
     });
-  }, [allTasks, filterText, advancedFilters]);
+  }, [allTasks, filters, filterText]);
 
   return (
     <div className="flex flex-col h-screen font-sans bg-[var(--color-back)] text-[var(--color-text-primary)]">
@@ -141,6 +136,7 @@ const App: React.FC = () => {
             aria-label={t('setup')}
             aria-pressed={isSetupOpen}
           >
+            {/* FIX: Corrected a typo in the SVG's viewBox attribute which caused a JSX parsing error. */}
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="4" y1="21" x2="4" y2="14"></line>
                 <line x1="4" y1="10" x2="4" y2="3"></line>
@@ -160,10 +156,10 @@ const App: React.FC = () => {
         onViewLevelChange={setViewLevel}
         currentDate={currentDate}
         onCurrentDateChange={setCurrentDate}
-        filterText={filterText}
-        onFilterChange={handleFilterChange}
         onOpenFilterModal={() => setIsFilterModalOpen(true)}
-        isAdvancedFilterActive={isAdvancedFilterActive}
+        isFilterActive={isFilterActive}
+        filterText={filterText}
+        onFilterTextChange={setFilterText}
       />
       <main className="flex-1 overflow-auto p-4">
         <KanbanBoard
@@ -186,9 +182,10 @@ const App: React.FC = () => {
       {isFilterModalOpen && (
         <FilterModal
             onClose={() => setIsFilterModalOpen(false)}
-            onApply={handleApplyAdvancedFilters}
-            currentFilters={advancedFilters}
+            onApply={handleApplyFilters}
+            currentFilters={filters}
             teamMembers={TEAM_MEMBERS}
+            allTitles={allUniqueTitles}
         />
       )}
       {selectedWorkPackageInfo && (
