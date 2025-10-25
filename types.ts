@@ -10,14 +10,6 @@ export interface TeamMember {
 // Explicit priority type
 export type Priority = 'Urgente' | 'Alta' | 'Média' | 'Baixa';
 
-// Interface for advanced filters
-export interface Filters {
-  titles: string[];
-  responsibles: string[];
-  priorities: Priority[];
-}
-
-
 // Base interface for all work packages
 interface WorkPackageBase {
   id: string;

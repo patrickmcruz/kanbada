@@ -4,10 +4,9 @@ import { KanbanBoard } from './components/KanbanBoard';
 import { Toolbar } from './components/Toolbar';
 import { SetupScreen } from './components/SetupScreen';
 import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
-import { FilterModal } from './components/FilterModal';
 import { TEAM_MEMBERS } from './data/team';
 import { WORK_PACKAGES as initialWorkPackages } from './data/work-packages';
-import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage, Filters } from './types';
+import type { ViewLevel, TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage } from './types';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -20,9 +19,9 @@ const App: React.FC = () => {
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [workPackages, setWorkPackages] = useState<(ProjectWorkPackage | DemandWorkPackage)[]>(initialWorkPackages);
-  const [filters, setFilters] = useState<Filters>({ titles: [], responsibles: [], priorities: [] });
   const [filterText, setFilterText] = useState('');
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [filterResponsible, setFilterResponsible] = useState('');
+  const [filterPriority, setFilterPriority] = useState('');
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [selectedWorkPackageInfo, setSelectedWorkPackageInfo] = useState<SelectedWorkPackageInfo | null>(null);
@@ -52,21 +51,10 @@ const App: React.FC = () => {
     });
   }, [workPackages]);
 
-  const allUniqueTitles = useMemo(() => {
-    const titles = allTasks.map(task => task.title);
-    return [...new Set(titles)].sort();
-  }, [allTasks]);
-
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
   };
   
-  const handleApplyFilters = (newFilters: Filters) => {
-    setFilters(newFilters);
-  };
-  
-  const isFilterActive = filterText.length > 0 || filters.titles.length > 0 || filters.responsibles.length > 0 || filters.priorities.length > 0;
-
   const handleWorkPackageDoubleClick = (task: TaskWorkPackage) => {
     let phaseTitle = '';
     let projectTitle = '';
@@ -95,28 +83,29 @@ const App: React.FC = () => {
   };
 
   const filteredTasks = useMemo(() => {
+    const responsibleMap = new Map(TEAM_MEMBERS.map(member => [member.id, member.name]));
+
+    const text = filterText.toLowerCase().trim();
+    const responsible = filterResponsible.toLowerCase().trim();
+    const priority = filterPriority.toLowerCase().trim();
+
+    if (!text && !responsible && !priority) {
+      return allTasks;
+    }
+
     return allTasks.filter(task => {
-      // Text filter from Toolbar
-      const searchText = filterText.trim().toLowerCase();
-      if (searchText && !(task.title.toLowerCase().includes(searchText) || task.projectId.toLowerCase().includes(searchText))) {
-          return false;
-      }
+      const taskTitle = task.title.toLowerCase();
+      const taskProjectId = task.projectId.toLowerCase();
+      const taskResponsibleName = (responsibleMap.get(task.ownerId ?? 'unassigned') ?? '').toLowerCase();
+      const taskPriority = (task.priority ?? '').toLowerCase();
 
-      // Advanced filters from Modal
-      const titleFilterMatch = filters.titles.length === 0 || filters.titles.includes(task.title);
-      if (!titleFilterMatch) return false;
+      const textMatch = !text || taskTitle.includes(text) || taskProjectId.includes(text);
+      const responsibleMatch = !responsible || taskResponsibleName.includes(responsible);
+      const priorityMatch = !priority || taskPriority.includes(priority);
 
-      const responsibleFilterMatch = filters.responsibles.length === 0 || 
-        filters.responsibles.includes(task.ownerId ?? 'unassigned');
-      if (!responsibleFilterMatch) return false;
-
-      const priorityFilterMatch = filters.priorities.length === 0 ||
-        (task.priority && filters.priorities.includes(task.priority));
-      if (!priorityFilterMatch) return false;
-
-      return true;
+      return textMatch && responsibleMatch && priorityMatch;
     });
-  }, [allTasks, filters, filterText]);
+  }, [allTasks, filterText, filterResponsible, filterPriority]);
 
   return (
     <div className="flex flex-col h-screen font-sans bg-[var(--color-back)] text-[var(--color-text-primary)]">
@@ -156,10 +145,12 @@ const App: React.FC = () => {
         onViewLevelChange={setViewLevel}
         currentDate={currentDate}
         onCurrentDateChange={setCurrentDate}
-        onOpenFilterModal={() => setIsFilterModalOpen(true)}
-        isFilterActive={isFilterActive}
         filterText={filterText}
         onFilterTextChange={setFilterText}
+        filterResponsible={filterResponsible}
+        onFilterResponsibleChange={setFilterResponsible}
+        filterPriority={filterPriority}
+        onFilterPriorityChange={setFilterPriority}
       />
       <main className="flex-1 overflow-auto p-4">
         <KanbanBoard
@@ -177,15 +168,6 @@ const App: React.FC = () => {
           onChangeTheme={setTheme}
           currentLang={i18n.language}
           onChangeLang={changeLanguage}
-        />
-      )}
-      {isFilterModalOpen && (
-        <FilterModal
-            onClose={() => setIsFilterModalOpen(false)}
-            onApply={handleApplyFilters}
-            currentFilters={filters}
-            teamMembers={TEAM_MEMBERS}
-            allTitles={allUniqueTitles}
         />
       )}
       {selectedWorkPackageInfo && (
