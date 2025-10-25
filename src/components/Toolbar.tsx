@@ -20,7 +20,6 @@ interface ToolbarProps {
   responsibleOptions: string[];
   priorityOptions: string[];
   activeView: AppView;
-  onActiveViewChange: (view: AppView) => void;
 }
 
 const ChevronLeftIcon = () => (
@@ -46,7 +45,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     responsibleOptions,
     priorityOptions,
     activeView,
-    onActiveViewChange
 }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
@@ -90,20 +88,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     <div className="flex items-center justify-between p-3 bg-[var(--color-surface-1)] border-b border-[var(--color-surface-2)] gap-4 flex-wrap">
       {/* Left side: Navigation and Date */}
       <div className="flex items-center gap-4 flex-shrink-0">
-        <div className="flex items-center bg-transparent border border-[var(--color-surface-2)] rounded-md flex-shrink-0">
-          {(['Workload', 'Kanban'] as AppView[]).map(view => (
-            <button
-              key={view}
-              onClick={() => onActiveViewChange(view)}
-              className={`px-4 py-2 text-sm font-medium border-l border-[var(--color-surface-2)] first:border-l-0 rounded-md first:rounded-r-none last:rounded-l-none cursor-pointer
-                ${activeView === view ? 'bg-[var(--color-main)] text-white' : 'text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)]'}`}
-            >
-              {t(view.toLowerCase())}
-            </button>
-          ))}
-        </div>
-
-        
         <button
           onClick={handleToday}
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] bg-[var(--color-surface-1)] border border-[var(--color-surface-2)] rounded-md hover:bg-[var(--color-surface-2)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--color-back)] focus:ring-[var(--color-main)] cursor-pointer"
