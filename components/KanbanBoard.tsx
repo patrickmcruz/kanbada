@@ -12,6 +12,24 @@ interface KanbanBoardProps {
   onWorkPackageDoubleClick: (workPackage: TaskWorkPackage) => void;
 }
 
+// --- Helper functions for new avatar design ---
+const avatarColors = [
+    'bg-purple-600', 'bg-green-600', 'bg-blue-600', 'bg-red-600',
+    'bg-yellow-600', 'bg-pink-600', 'bg-indigo-600', 'bg-teal-600'
+];
+const getColorForId = (id: string) => {
+    let hash = 0;
+    if (id.length === 0) return avatarColors[0];
+    for (let i = 0; i < id.length; i++) {
+        hash = id.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash;
+    }
+    const index = Math.abs(hash % avatarColors.length);
+    return avatarColors[index];
+}
+const getInitials = (name: string) => name.charAt(0).toUpperCase();
+// --- End of helper functions ---
+
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageDoubleClick }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
@@ -125,14 +143,30 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
     <div className="bg-[var(--color-surface-1)] rounded-lg overflow-hidden border border-[var(--color-surface-2)] flex h-full">
         {/* --- Left Column: Responsible --- */}
         <div className="flex-shrink-0 z-10 border-r border-[var(--color-surface-2)]" style={{ width: '150px' }}>
-            <div className="p-3 font-semibold text-sm text-[var(--color-text-secondary)] bg-[var(--color-back)] border-b border-[var(--color-surface-2)] sticky top-0">
+            <div className="p-4 font-bold text-xs text-center uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-[var(--color-surface-2)] sticky top-0">
                 {t('responsible')}
             </div>
-            {allMembers.map((member) => (
-                <div key={member.id} className="p-3 text-sm font-medium text-[var(--color-text-primary)] bg-transparent border-b border-[var(--color-surface-2)] min-h-[80px] flex items-center">
-                    {member.id === 'unassigned' ? t('unassigned') : member.name}
-                </div>
-            ))}
+            {allMembers.map((member) => {
+                if (member.id === 'unassigned') {
+                    return (
+                        <div key={member.id} className="p-3 text-sm font-medium text-center text-[var(--color-text-secondary)] italic bg-transparent border-b border-[var(--color-surface-2)] min-h-[80px] flex items-center justify-center">
+                            {t('unassigned')}
+                        </div>
+                    );
+                }
+                
+                const avatarColor = getColorForId(member.id);
+                const initials = getInitials(member.name);
+        
+                return (
+                    <div key={member.id} className="p-3 text-sm font-medium text-[var(--color-text-primary)] bg-transparent border-b border-[var(--color-surface-2)] min-h-[80px] flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0 ${avatarColor}`}>
+                            {initials}
+                        </div>
+                        <span className="truncate capitalize">{member.name}</span>
+                    </div>
+                );
+            })}
         </div>
 
         {/* --- Right Column: Timeline (scrollable) --- */}
@@ -146,7 +180,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ viewLevel, currentDate
             >
                 {/* Date Headers */}
                 {dateColumns.map((col, index) => (
-                    <div key={index} className="p-3 text-center font-semibold text-sm text-[var(--color-text-secondary)] bg-[var(--color-back)] border-b border-r border-[var(--color-surface-2)] last:border-r-0 sticky top-0 z-20">
+                    <div key={index} className="p-4 text-center font-bold text-xs uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-r border-[var(--color-surface-2)] last:border-r-0 sticky top-0 z-20">
                         {col.label}
                     </div>
                 ))}
