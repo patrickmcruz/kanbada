@@ -42,7 +42,7 @@ export const useWorkload = (currentDate: Date) => {
         return Array.from(responsibles).sort();
     }, [allTasks]);
 
-    const priorityOptions = useMemo((): Priority[] => ['Urgente', 'Alta', 'Média', 'Baixa'], []);
+    const priorityOptions = useMemo((): Priority[] => ['urgent', 'high', 'medium', 'low'], []);
 
     const handleTaskStatusChange = (taskId: string, newStatus: string) => {
         const updatedWorkPackages = workPackages.map(container => {

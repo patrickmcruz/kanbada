@@ -79,7 +79,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     return (
         <div className="flex items-center gap-2">
             <span className={`w-3 h-3 rounded-full ${dot}`}></span>
-            <span>{option}</span>
+            <span>{t(`priority_${priority}`)}</span>
         </div>
     );
   };

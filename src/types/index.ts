@@ -11,7 +11,7 @@ export interface TeamMember {
 }
 
 // Explicit priority type
-export type Priority = 'Urgente' | 'Alta' | 'Média' | 'Baixa';
+export type Priority = 'urgent' | 'high' | 'medium' | 'low';
 
 // Base interface for all work packages
 interface WorkPackageBase {

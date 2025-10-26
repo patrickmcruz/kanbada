@@ -58,7 +58,7 @@ const CompactTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId:
 };
 
 const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId: string) => void; teamMembers: TeamMember[] }> = ({ task, onDoubleClick, teamMembers }) => {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
     const owner = teamMembers.find(m => m.id === task.ownerId);
     const { border: borderColor, dot: dotColor, text: textColor } = getPriorityClasses(task.priority);
@@ -85,7 +85,7 @@ const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId
                 {task.priority && (
                      <div className="flex items-center gap-2">
                         <span className={`w-2.5 h-2.5 rounded-full ${dotColor}`}></span>
-                        <span className={`font-medium ${textColor}`}>{task.priority}</span>
+                        <span className={`font-medium ${textColor}`}>{t(`priority_${task.priority}`)}</span>
                     </div>
                 )}
 
@@ -104,10 +104,10 @@ const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId
 };
 
 const priorityOrder: Record<Priority, number> = {
-  'Urgente': 1,
-  'Alta': 2,
-  'Média': 3,
-  'Baixa': 4,
+  'urgent': 1,
+  'high': 2,
+  'medium': 3,
+  'low': 4,
 };
 
 const MoreVerticalIcon = () => (

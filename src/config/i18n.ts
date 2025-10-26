@@ -74,6 +74,11 @@ const resources = {
       sortByPriority: "Sort by Priority",
       sortByTitle: "Sort by Title",
       sortByResponsible: "Sort by Responsible",
+      // Priorities
+      priority_urgent: "Urgent",
+      priority_high: "High",
+      priority_medium: "Medium",
+      priority_low: "Low",
     }
   },
   pt: {
@@ -147,6 +152,11 @@ const resources = {
       sortByPriority: "Ordenar por Prioridade",
       sortByTitle: "Ordenar por Título",
       sortByResponsible: "Ordenar por Responsável",
+      // Priorities
+      priority_urgent: "Urgente",
+      priority_high: "Alta",
+      priority_medium: "Média",
+      priority_low: "Baixa",
     }
   }
 };

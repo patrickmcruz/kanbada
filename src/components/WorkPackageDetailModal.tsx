@@ -78,7 +78,7 @@ export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ 
                         value={
                             <div className="flex items-center gap-2">
                                 <span className={`w-3 h-3 rounded-full ${priorityClasses.dot}`}></span>
-                                <span className={`font-medium ${priorityClasses.text}`}>{workPackage.priority}</span>
+                                <span className={`font-medium ${priorityClasses.text}`}>{t(`priority_${workPackage.priority}`)}</span>
                             </div>
                         } 
                     />
