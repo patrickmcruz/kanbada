@@ -232,7 +232,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
               return (
                   <div className="space-y-8">
                       <Section title={t('kanbanColumns')}>
-                          <div className='space-y-2 max-h-48 overflow-y-auto pr-2'>
+                          <div className='space-y-2 max-h-80 overflow-y-auto pr-2'>
                               {kanbanColumns.map((column, index) => (
                                 <div 
                                     key={column}
@@ -350,7 +350,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                   <TabButton icon={<KanbanIcon/>} label={t('kanban')} isActive={activeTab === 'kanban'} onClick={() => setActiveTab('kanban')} />
               </nav>
               
-              <main className="flex-1 p-6 space-y-8 overflow-y-auto h-[430px]">
+              <main className="flex-1 p-6 space-y-8 overflow-y-auto">
                   {renderContent()}
               </main>
           </div>

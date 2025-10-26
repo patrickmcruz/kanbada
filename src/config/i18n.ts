@@ -67,6 +67,7 @@ const resources = {
       toDo: "To Do",
       sprint: "Sprint",
       doing: "Doing",
+      review: "Review",
       done: "Done",
       // KanbanView.tsx
       sort: "Sort",
@@ -139,6 +140,7 @@ const resources = {
       toDo: "A Fazer",
       sprint: "Sprint",
       doing: "Em Andamento",
+      review: "Homologação",
       done: "Feito",
       // KanbanView.tsx
       sort: "Ordenar",
