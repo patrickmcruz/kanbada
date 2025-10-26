@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SortKey } from '../types';
+import type { SortKey, TaskWorkPackage } from '../types';
 
 interface SetupScreenProps {
   onClose: () => void;
@@ -11,6 +11,8 @@ interface SetupScreenProps {
   kanbanColumns: string[];
   onChangeKanbanColumns: (columns: string[]) => void;
   onDeleteKanbanColumn: (column: string) => void;
+  onRenameKanbanColumn: (oldName: string, newName: string) => boolean;
+  allTasks: TaskWorkPackage[];
   defaultKanbanSort: SortKey;
   onChangeDefaultKanbanSort: (sortKey: SortKey) => void;
   sprintDays: number;
@@ -51,11 +53,13 @@ const Section: React.FC<{title: string, children: React.ReactNode}> = ({ title, 
 );
 
 
-export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays }) => {
+export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, onRenameKanbanColumn, allTasks, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays }) => {
   const { t } = useTranslation();
   const [newColumnName, setNewColumnName] = useState('');
   const [activeTab, setActiveTab] = useState<SetupTab>('general');
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [editingColumn, setEditingColumn] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState('');
   const dragTargetRef = React.useRef<HTMLDivElement | null>(null);
 
   const handleAddColumn = (e: React.FormEvent) => {
@@ -64,12 +68,6 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
     if (trimmedName && !kanbanColumns.find(col => col.toLowerCase() === trimmedName.toLowerCase())) {
         onChangeKanbanColumns([...kanbanColumns, trimmedName]);
         setNewColumnName('');
-    }
-  };
-
-  const handleDeleteColumn = (columnToDelete: string) => {
-    if (window.confirm(t('confirmDeleteColumn', { columnName: t(columnToDelete) }))) {
-      onDeleteKanbanColumn(columnToDelete);
     }
   };
   
@@ -82,8 +80,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
       e.preventDefault();
       if (draggedIndex === null || draggedIndex === index) return;
       
-      const target = e.currentTarget as HTMLDivElement;
-      dragTargetRef.current = target;
+      dragTargetRef.current = e.currentTarget as HTMLDivElement;
       
       const newColumns = [...kanbanColumns];
       const [draggedItem] = newColumns.splice(draggedIndex, 1);
@@ -98,6 +95,31 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
   const handleDragEnd = () => {
     setDraggedIndex(null);
     dragTargetRef.current = null;
+  };
+
+  const handleStartEditing = (column: string) => {
+    setEditingColumn(column);
+    setEditingValue(column);
+  };
+
+  const handleFinishEditing = () => {
+    if (editingColumn && editingValue.trim() && editingColumn !== editingValue.trim()) {
+      const success = onRenameKanbanColumn(editingColumn, editingValue.trim());
+      if (!success) {
+        alert(t('renameColumnError'));
+      }
+    }
+    setEditingColumn(null);
+    setEditingValue('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleFinishEditing();
+    } else if (e.key === 'Escape') {
+      setEditingColumn(null);
+      setEditingValue('');
+    }
   };
 
   const renderContent = () => {
@@ -157,7 +179,9 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                   <div className="space-y-8">
                       <Section title={t('kanbanColumns')}>
                           <div className='space-y-2 max-h-48 overflow-y-auto pr-2'>
-                              {kanbanColumns.map((column, index) => (
+                              {kanbanColumns.map((column, index) => {
+                                const tasksInColumn = allTasks.some(task => task.status === column);
+                                return (
                                 <div 
                                     key={column}
                                     draggable
@@ -168,18 +192,37 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                 >
                                     <div className="flex items-center gap-2 text-sm cursor-grab active:cursor-grabbing">
                                         <GripVerticalIcon />
-                                        <span>{t(column)}</span>
+                                        {editingColumn === column ? (
+                                            <input
+                                                type="text"
+                                                value={editingValue}
+                                                onChange={(e) => setEditingValue(e.target.value)}
+                                                onBlur={handleFinishEditing}
+                                                onKeyDown={handleKeyDown}
+                                                autoFocus
+                                                className="bg-[var(--color-surface-3)] border border-[var(--color-main)] focus:outline-none text-sm rounded px-1 py-0.5"
+                                            />
+                                        ) : (
+                                            <span onDoubleClick={() => handleStartEditing(column)} className="py-0.5">{t(column)}</span>
+                                        )}
                                     </div>
-                                  <button 
-                                      onClick={() => handleDeleteColumn(column)}
-                                      disabled={column === 'toDo' || kanbanColumns.length <= 1}
-                                      className="p-1 rounded-full text-red-400 hover:bg-red-500/20 disabled:text-[var(--color-surface-3)] disabled:hover:bg-transparent disabled:cursor-not-allowed"
-                                      aria-label={`Delete ${column}`}
-                                  >
-                                      <TrashIcon />
-                                  </button>
+                                    <div className="relative group">
+                                        <button 
+                                            onClick={() => onDeleteKanbanColumn(column)}
+                                            className={`p-1 rounded-full text-red-400 ${tasksInColumn ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500/20'}`}
+                                            aria-label={`Delete ${column}`}
+                                            disabled={tasksInColumn}
+                                        >
+                                            <TrashIcon />
+                                        </button>
+                                        {tasksInColumn && (
+                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 bg-[var(--color-surface-3)] text-[var(--color-text-primary)] text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                                {t('deleteColumnError')}
+                                            </div>
+                                        )}
+                                    </div>
                               </div>
-                              ))}
+                              )})}
                           </div>
                           <form onSubmit={handleAddColumn} className="flex gap-2 mt-4">
                               <input 

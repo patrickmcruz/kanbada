@@ -63,13 +63,11 @@ export const useWorkload = (currentDate: Date) => {
         });
         setWorkPackages(updatedWorkPackages);
     };
-
-    const moveTasksToToDo = (columnName: string) => {
-        if (columnName === 'toDo') return;
-
+    
+    const handleRenameColumnTasks = (oldStatus: string, newStatus: string) => {
         const updatedWorkPackages = workPackages.map(container => {
             const updateTasks = (tasks: TaskWorkPackage[]) => tasks.map(task =>
-                task.status === columnName ? { ...task, status: 'toDo' } : task
+                task.status === oldStatus ? { ...task, status: newStatus } : task
             );
 
             if (container.type === 'Project') {
@@ -85,6 +83,7 @@ export const useWorkload = (currentDate: Date) => {
         });
         setWorkPackages(updatedWorkPackages);
     };
+
 
     const filteredTasks = useMemo(() => {
         const responsibleMap = new Map(TEAM_MEMBERS.map(member => [member.id, member.name]));
@@ -118,6 +117,7 @@ export const useWorkload = (currentDate: Date) => {
 
     return {
         workPackages,
+        allTasks,
         filteredTasks,
         kanbanTasks,
         cardNameOptions,
@@ -130,6 +130,6 @@ export const useWorkload = (currentDate: Date) => {
         filterPriority,
         setFilterPriority,
         handleTaskStatusChange,
-        moveTasksToToDo,
+        handleRenameColumnTasks,
     };
 };

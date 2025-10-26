@@ -21,6 +21,7 @@ const App: React.FC = () => {
 
   const {
     workPackages,
+    allTasks,
     filteredTasks,
     kanbanTasks,
     cardNameOptions,
@@ -33,7 +34,7 @@ const App: React.FC = () => {
     filterPriority,
     setFilterPriority,
     handleTaskStatusChange,
-    moveTasksToToDo,
+    handleRenameColumnTasks,
   } = useWorkload(currentDate);
 
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
@@ -54,11 +55,6 @@ const App: React.FC = () => {
     i18n.changeLanguage(lng);
   };
   
-  const handleDeleteKanbanColumn = (columnToDelete: string) => {
-    moveTasksToToDo(columnToDelete);
-    setKanbanColumns(prevColumns => prevColumns.filter(c => c !== columnToDelete));
-  };
-
   const handleWorkPackageDoubleClick = (task: TaskWorkPackage) => {
     let phaseTitle = '';
     let projectTitle = '';
@@ -85,6 +81,23 @@ const App: React.FC = () => {
     
     setSelectedWorkPackageInfo({ task, phaseTitle: phaseTitle || 'N/A', projectTitle: projectTitle || 'N/A' });
   };
+
+  const handleDeleteKanbanColumn = (columnToDelete: string) => {
+    const isColumnEmpty = !allTasks.some(task => task.status === columnToDelete);
+    if (isColumnEmpty) {
+      setKanbanColumns(prev => prev.filter(c => c !== columnToDelete));
+    }
+  };
+
+  const handleRenameKanbanColumn = (oldName: string, newName: string) => {
+    if (kanbanColumns.some(col => col.toLowerCase() === newName.toLowerCase() && col.toLowerCase() !== oldName.toLowerCase())) {
+        return false; // Indicate failure due to duplicate name
+    }
+    handleRenameColumnTasks(oldName, newName);
+    setKanbanColumns(prev => prev.map(col => col === oldName ? newName : col));
+    return true; // Indicate success
+  };
+
 
   return (
     <div className="flex flex-col h-screen font-sans bg-[var(--color-back)] text-[var(--color-text-primary)]">
@@ -171,6 +184,8 @@ const App: React.FC = () => {
           kanbanColumns={kanbanColumns}
           onChangeKanbanColumns={setKanbanColumns}
           onDeleteKanbanColumn={handleDeleteKanbanColumn}
+          onRenameKanbanColumn={handleRenameKanbanColumn}
+          allTasks={allTasks}
           defaultKanbanSort={defaultKanbanSort}
           onChangeDefaultKanbanSort={setDefaultKanbanSort}
           sprintDays={sprintDays}

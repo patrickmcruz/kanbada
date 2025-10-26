@@ -48,7 +48,7 @@ export const WORK_PACKAGES: (ProjectWorkPackage | DemandWorkPackage)[] = [
             hours: 160,
             ownerId: 'joaozinho',
             startDate: firstMondayOfOctober,
-            endDate: addDays(firstMondayOfOctober, 44),
+            endDate: addDays(firstMondayOfOctober, 25),
             priority: 'Urgente',
             status: 'toDo',
           },
