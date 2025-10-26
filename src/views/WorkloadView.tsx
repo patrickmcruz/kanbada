@@ -213,7 +213,7 @@ export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDa
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                     {responsibleSortOrder === 'asc' ? <ArrowUpIcon /> : <ArrowDownIcon />}
                 </div>
-                <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
+                <div className="absolute bottom-full -mb-2 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
                     {t('sortResponsibleTooltip')}
                 </div>
             </div>

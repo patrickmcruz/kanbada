@@ -114,7 +114,7 @@ const resources = {
       // WorkloadView.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",
-      sortResponsibleTooltip: "Clique para ordenar",
+      sortResponsibleTooltip: "Ordenar",
       // SetupScreen.tsx
       theme: "Tema",
       language: "Idioma",
