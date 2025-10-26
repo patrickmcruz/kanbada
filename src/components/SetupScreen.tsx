@@ -12,6 +12,8 @@ interface SetupScreenProps {
   onChangeKanbanColumns: (columns: string[]) => void;
   defaultKanbanSort: SortKey;
   onChangeDefaultKanbanSort: (sortKey: SortKey) => void;
+  sprintDays: number;
+  onChangeSprintDays: (days: number) => void;
 }
 
 type SetupTab = 'general' | 'workload' | 'kanban';
@@ -23,6 +25,7 @@ const TrashIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" heigh
 const GeneralIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
 const WorkloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>;
 const KanbanIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M6 3v18"/><path d="M18 3v18"/></svg>;
+const GripVerticalIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-text-secondary)]"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>;
 
 const TabButton: React.FC<{ icon: React.ReactNode; label: string; isActive: boolean; onClick: () => void; }> = ({ icon, label, isActive, onClick }) => (
   <button
@@ -47,10 +50,12 @@ const Section: React.FC<{title: string, children: React.ReactNode}> = ({ title, 
 );
 
 
-export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, defaultKanbanSort, onChangeDefaultKanbanSort }) => {
+export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays }) => {
   const { t } = useTranslation();
   const [newColumnName, setNewColumnName] = useState('');
   const [activeTab, setActiveTab] = useState<SetupTab>('general');
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const dragTargetRef = React.useRef<HTMLDivElement | null>(null);
 
   const handleAddColumn = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +70,33 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
       onChangeKanbanColumns(kanbanColumns.filter(c => c !== columnToDelete));
   };
   
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+  
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+      e.preventDefault();
+      if (draggedIndex === null || draggedIndex === index) return;
+      
+      const target = e.currentTarget as HTMLDivElement;
+      dragTargetRef.current = target;
+      
+      const newColumns = [...kanbanColumns];
+      const [draggedItem] = newColumns.splice(draggedIndex, 1);
+      newColumns.splice(index, 0, draggedItem);
+
+      if (JSON.stringify(newColumns) !== JSON.stringify(kanbanColumns)) {
+        onChangeKanbanColumns(newColumns);
+        setDraggedIndex(index);
+      }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    dragTargetRef.current = null;
+  };
+
   const renderContent = () => {
       switch(activeTab) {
           case 'general':
@@ -122,17 +154,27 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                   <div className="space-y-8">
                       <Section title={t('kanbanColumns')}>
                           <div className='space-y-2 max-h-48 overflow-y-auto pr-2'>
-                              {kanbanColumns.map(column => (
-                                  <div key={column} className="flex items-center justify-between bg-[var(--color-surface-2)] p-2 rounded-md">
-                                      <span className="text-sm">{t(column)}</span>
-                                      <button 
-                                          onClick={() => handleDeleteColumn(column)}
-                                          className="p-1 rounded-full text-red-400 hover:bg-red-500/20"
-                                          aria-label={`Delete ${column}`}
-                                      >
-                                          <TrashIcon />
-                                      </button>
-                                  </div>
+                              {kanbanColumns.map((column, index) => (
+                                <div 
+                                    key={column}
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, index)}
+                                    onDragOver={(e) => handleDragOver(e, index)}
+                                    onDragEnd={handleDragEnd}
+                                    className={`flex items-center justify-between bg-[var(--color-surface-2)] p-2 rounded-md transition-opacity ${draggedIndex === index ? 'opacity-30' : 'opacity-100'}`}
+                                >
+                                    <div className="flex items-center gap-2 text-sm cursor-grab active:cursor-grabbing">
+                                        <GripVerticalIcon />
+                                        <span>{t(column)}</span>
+                                    </div>
+                                  <button 
+                                      onClick={() => handleDeleteColumn(column)}
+                                      className="p-1 rounded-full text-red-400 hover:bg-red-500/20"
+                                      aria-label={`Delete ${column}`}
+                                  >
+                                      <TrashIcon />
+                                  </button>
+                              </div>
                               ))}
                           </div>
                           <form onSubmit={handleAddColumn} className="flex gap-2 mt-4">
@@ -151,6 +193,21 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                   <PlusIcon />
                               </button>
                           </form>
+                      </Section>
+                      <Section title={t('sprintSettings')}>
+                        <div>
+                            <label htmlFor="sprint-days" className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                                {t('sprintDuration')}
+                            </label>
+                            <input
+                                type="number"
+                                id="sprint-days"
+                                value={sprintDays}
+                                onChange={(e) => onChangeSprintDays(parseInt(e.target.value, 10) || 1)}
+                                min="1"
+                                className="w-full max-w-xs rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
+                            />
+                        </div>
                       </Section>
                       <Section title={t('defaultColumnSort')}>
                           <select

@@ -10,7 +10,9 @@ interface KanbanViewProps {
   teamMembers: TeamMember[];
   defaultSortKey: SortKey;
   onTaskStatusChange: (taskId: string, newStatus: string) => void;
+  onColumnsChange: (columns: string[]) => void;
   onWorkPackageDoubleClick: (workPackage: TaskWorkPackage) => void;
+  sprintDays: number;
 }
 
 // --- Avatar helper functions ---
@@ -113,9 +115,10 @@ const MoreVerticalIcon = () => (
 );
 
 
-export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMembers, onTaskStatusChange, defaultSortKey, onWorkPackageDoubleClick }) => {
+export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMembers, onTaskStatusChange, onColumnsChange, defaultSortKey, onWorkPackageDoubleClick, sprintDays }) => {
   const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
+  const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<Record<string, SortKey>>({});
   const [openSortMenu, setOpenSortMenu] = useState<string | null>(null);
@@ -137,25 +140,45 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
     setExpandedCardId(null);
   };
 
+  const handleColumnDragStart = (e: React.DragEvent<HTMLDivElement>, column: string) => {
+    e.dataTransfer.setData('columnName', column);
+    setDraggedColumn(column);
+  };
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, newStatus: string) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetColumn: string) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('taskId');
+    const draggedColumnName = e.dataTransfer.getData('columnName');
+
     if (taskId) {
-        onTaskStatusChange(taskId, newStatus);
+      onTaskStatusChange(taskId, targetColumn);
+    } else if (draggedColumnName && draggedColumnName !== targetColumn) {
+        const newColumns = [...columns];
+        const draggedIndex = newColumns.indexOf(draggedColumnName);
+        const targetIndex = newColumns.indexOf(targetColumn);
+
+        if (draggedIndex > -1) {
+            const [removed] = newColumns.splice(draggedIndex, 1);
+            newColumns.splice(targetIndex, 0, removed);
+            onColumnsChange(newColumns);
+        }
     }
-    setIsDragging(false);
   };
   
   const handleDragEnd = () => {
     setIsDragging(false);
+    setDraggedColumn(null);
   };
   
   const handleCardDoubleClick = (taskId: string) => {
-    setExpandedCardId(currentId => currentId === taskId ? null : taskId);
+    const task = tasks.find(t => t.id === taskId);
+    if(task) {
+      onWorkPackageDoubleClick(task);
+    }
   };
 
   const handleSortChange = (columnName: string, key: SortKey) => {
@@ -197,11 +220,22 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
             key={column}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, column)}
-            className="w-80 flex-shrink-0 bg-[var(--color-surface-2)] rounded-lg flex flex-col drop-cell transition-colors"
+            className={`w-80 flex-shrink-0 bg-[var(--color-surface-2)] rounded-lg flex flex-col drop-cell transition-all duration-200 ${draggedColumn === column ? 'opacity-30' : ''}`}
           >
-            <div className="p-3 border-b-2 border-[var(--color-surface-1)] sticky top-0 bg-[var(--color-surface-2)] rounded-t-lg z-10">
+            <div
+              draggable
+              onDragStart={(e) => handleColumnDragStart(e, column)} 
+              className="p-3 border-b-2 border-[var(--color-surface-1)] sticky top-0 bg-[var(--color-surface-2)] rounded-t-lg z-10 cursor-grab active:cursor-grabbing"
+            >
               <div className="font-bold text-sm uppercase tracking-wider text-[var(--color-text-primary)] flex justify-between items-center">
-                <span>{t(column)}</span>
+                <span>
+                  {t(column)}
+                  {column.toLowerCase() === 'sprint' && (
+                    <span className="ml-1.5 text-[var(--color-text-secondary)]">
+                        (+{sprintDays})
+                    </span>
+                  )}
+                </span>
                 <div className="flex items-center gap-2">
                     <span className="text-xs font-mono bg-[var(--color-surface-3)] text-[var(--color-text-secondary)] px-2 py-1 rounded-full">{tasksInColumn.length} / {totalHours}h</span>
                     <div className="relative">
@@ -242,7 +276,7 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
                   { expandedCardId === task.id ? (
                     <ExpandedTaskCard
                       task={task}
-                      onDoubleClick={handleCardDoubleClick}
+                      onDoubleClick={() => setExpandedCardId(null)}
                       teamMembers={teamMembers}
                     />
                   ) : (
