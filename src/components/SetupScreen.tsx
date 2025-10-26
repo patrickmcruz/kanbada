@@ -10,6 +10,7 @@ interface SetupScreenProps {
   onChangeLang: (lang: string) => void;
   kanbanColumns: string[];
   onChangeKanbanColumns: (columns: string[]) => void;
+  onDeleteKanbanColumn: (column: string) => void;
   defaultKanbanSort: SortKey;
   onChangeDefaultKanbanSort: (sortKey: SortKey) => void;
   sprintDays: number;
@@ -50,7 +51,7 @@ const Section: React.FC<{title: string, children: React.ReactNode}> = ({ title, 
 );
 
 
-export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays }) => {
+export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays }) => {
   const { t } = useTranslation();
   const [newColumnName, setNewColumnName] = useState('');
   const [activeTab, setActiveTab] = useState<SetupTab>('general');
@@ -67,7 +68,9 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
   };
 
   const handleDeleteColumn = (columnToDelete: string) => {
-      onChangeKanbanColumns(kanbanColumns.filter(c => c !== columnToDelete));
+    if (window.confirm(t('confirmDeleteColumn', { columnName: t(columnToDelete) }))) {
+      onDeleteKanbanColumn(columnToDelete);
+    }
   };
   
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
@@ -169,7 +172,8 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                     </div>
                                   <button 
                                       onClick={() => handleDeleteColumn(column)}
-                                      className="p-1 rounded-full text-red-400 hover:bg-red-500/20"
+                                      disabled={column === 'toDo' || kanbanColumns.length <= 1}
+                                      className="p-1 rounded-full text-red-400 hover:bg-red-500/20 disabled:text-[var(--color-surface-3)] disabled:hover:bg-transparent disabled:cursor-not-allowed"
                                       aria-label={`Delete ${column}`}
                                   >
                                       <TrashIcon />

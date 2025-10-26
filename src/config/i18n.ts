@@ -40,6 +40,7 @@ const resources = {
       general: "General",
       appearance: "Appearance",
       noWorkloadSettings: "No specific settings for this view yet.",
+      confirmDeleteColumn: "Are you sure you want to delete the '{{columnName}}' column? All tasks in this column will be moved to 'To Do'.",
       // TaskDetailModal.tsx
       taskDetails: "Work Package Details",
       project: "Project",
@@ -103,6 +104,7 @@ const resources = {
       general: "Geral",
       appearance: "Aparência",
       noWorkloadSettings: "Ainda não há configurações específicas para esta visão.",
+      confirmDeleteColumn: "Tem certeza que deseja excluir a coluna '{{columnName}}'? Todas as tarefas nesta coluna serão movidas para 'A Fazer'.",
       // TaskDetailModal.tsx
       taskDetails: "Detalhes do Pacote de Trabalho",
       project: "Projeto",

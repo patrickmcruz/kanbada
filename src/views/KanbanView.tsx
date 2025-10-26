@@ -57,7 +57,7 @@ const CompactTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId:
     );
 };
 
-const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId: string) => void; teamMembers: TeamMember[] }> = ({ task, onDoubleClick, teamMembers }) => {
+const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: () => void; teamMembers: TeamMember[] }> = ({ task, onDoubleClick, teamMembers }) => {
     const { i18n } = useTranslation();
     const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
     const owner = teamMembers.find(m => m.id === task.ownerId);
@@ -65,7 +65,7 @@ const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId
 
     return (
         <div
-            onDoubleClick={() => onDoubleClick(task.id)}
+            onDoubleClick={() => onDoubleClick()}
             className={`w-full bg-[var(--color-surface-1)] rounded-lg p-3 cursor-pointer border-l-4 ${borderColor} ring-2 ring-[var(--color-main)] shadow-lg`}
         >
             <p className="font-bold text-sm text-[var(--color-text-primary)] mb-2">
@@ -175,10 +175,7 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
   };
   
   const handleCardDoubleClick = (taskId: string) => {
-    const task = tasks.find(t => t.id === taskId);
-    if(task) {
-      onWorkPackageDoubleClick(task);
-    }
+    setExpandedCardId(taskId);
   };
 
   const handleSortChange = (columnName: string, key: SortKey) => {

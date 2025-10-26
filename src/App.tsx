@@ -33,6 +33,7 @@ const App: React.FC = () => {
     filterPriority,
     setFilterPriority,
     handleTaskStatusChange,
+    moveTasksToToDo,
   } = useWorkload(currentDate);
 
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
@@ -53,6 +54,11 @@ const App: React.FC = () => {
     i18n.changeLanguage(lng);
   };
   
+  const handleDeleteKanbanColumn = (columnToDelete: string) => {
+    moveTasksToToDo(columnToDelete);
+    setKanbanColumns(prevColumns => prevColumns.filter(c => c !== columnToDelete));
+  };
+
   const handleWorkPackageDoubleClick = (task: TaskWorkPackage) => {
     let phaseTitle = '';
     let projectTitle = '';
@@ -164,6 +170,7 @@ const App: React.FC = () => {
           onChangeLang={changeLanguage}
           kanbanColumns={kanbanColumns}
           onChangeKanbanColumns={setKanbanColumns}
+          onDeleteKanbanColumn={handleDeleteKanbanColumn}
           defaultKanbanSort={defaultKanbanSort}
           onChangeDefaultKanbanSort={setDefaultKanbanSort}
           sprintDays={sprintDays}

@@ -64,6 +64,28 @@ export const useWorkload = (currentDate: Date) => {
         setWorkPackages(updatedWorkPackages);
     };
 
+    const moveTasksToToDo = (columnName: string) => {
+        if (columnName === 'toDo') return;
+
+        const updatedWorkPackages = workPackages.map(container => {
+            const updateTasks = (tasks: TaskWorkPackage[]) => tasks.map(task =>
+                task.status === columnName ? { ...task, status: 'toDo' } : task
+            );
+
+            if (container.type === 'Project') {
+                return {
+                    ...container,
+                    phases: container.phases.map(phase => ({ ...phase, tasks: updateTasks(phase.tasks) }))
+                };
+            }
+            if (container.type === 'Demand') {
+                return { ...container, tasks: updateTasks(container.tasks) };
+            }
+            return container;
+        });
+        setWorkPackages(updatedWorkPackages);
+    };
+
     const filteredTasks = useMemo(() => {
         const responsibleMap = new Map(TEAM_MEMBERS.map(member => [member.id, member.name]));
 
@@ -108,5 +130,6 @@ export const useWorkload = (currentDate: Date) => {
         filterPriority,
         setFilterPriority,
         handleTaskStatusChange,
+        moveTasksToToDo,
     };
 };
