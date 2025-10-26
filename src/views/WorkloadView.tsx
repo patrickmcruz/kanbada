@@ -131,35 +131,41 @@ export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDa
     const viewStartDateSOD = getStartOfDay(viewStartDate);
     const viewEndDateSOD = getStartOfDay(viewEndDate);
 
+    // Ensure task is within the current view's timeframe
     if (taskEndDateSOD.getTime() < viewStartDateSOD.getTime() || taskStartDateSOD.getTime() > viewEndDateSOD.getTime()) {
       return null;
     }
-
+    
+    // Clamp task dates to the visible range of the view
     const taskStartInView = new Date(Math.max(taskStartDateSOD.getTime(), viewStartDateSOD.getTime()));
     const taskEndInView = new Date(Math.min(taskEndDateSOD.getTime(), viewEndDateSOD.getTime()));
 
-    let startColIndex = dateColumns.findIndex(col =>
-        taskStartInView.getTime() <= getStartOfDay(col.endDate).getTime()
-    );
-    if (startColIndex === -1) { 
-        return null;
-    }
-    
+    const taskStartMillis = taskStartInView.getTime();
+    const taskEndMillis = taskEndInView.getTime();
+
+    let startColIndex = -1;
     let endColIndex = -1;
-    for(let i = dateColumns.length - 1; i >= 0; i--) {
-        if (taskEndInView.getTime() >= getStartOfDay(dateColumns[i].startDate).getTime()) {
-            endColIndex = i;
-            break;
+
+    // Find the first and last columns the task overlaps with
+    for (let i = 0; i < dateColumns.length; i++) {
+        const colStartMillis = getStartOfDay(dateColumns[i].startDate).getTime();
+        const colEndMillis = getStartOfDay(dateColumns[i].endDate).getTime();
+
+        // Check for overlap: (StartA <= EndB) and (EndA >= StartB)
+        const hasOverlap = taskStartMillis <= colEndMillis && taskEndMillis >= colStartMillis;
+
+        if (hasOverlap) {
+            if (startColIndex === -1) {
+                startColIndex = i; // Set the first overlapping column
+            }
+            endColIndex = i; // Continuously update to find the last overlapping column
         }
     }
-    if(endColIndex === -1) {
-        return null;
+
+    if (startColIndex === -1) {
+        return null; // No visible part of the task in the current view
     }
-    
-    if(startColIndex > endColIndex) {
-        startColIndex = endColIndex;
-    }
-    
+
     const columnSpan = endColIndex - startColIndex + 1;
     if (columnSpan <= 0) return null;
 
