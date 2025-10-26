@@ -7,7 +7,7 @@ import { SetupScreen } from './components/SetupScreen';
 import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { useWorkload } from './hooks/useWorkload';
 import { TEAM_MEMBERS } from './data/team';
-import type { ViewLevel, TaskWorkPackage, AppView } from './types';
+import type { ViewLevel, TaskWorkPackage, AppView, SortKey } from './types';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -40,6 +40,7 @@ const App: React.FC = () => {
   const [kanbanColumns, setKanbanColumns] = useState<string[]>(['toDo', 'sprint', 'doing', 'done']);
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [defaultKanbanSort, setDefaultKanbanSort] = useState<SortKey>('priority');
   const [selectedWorkPackageInfo, setSelectedWorkPackageInfo] = useState<SelectedWorkPackageInfo | null>(null);
 
   useEffect(() => {
@@ -147,6 +148,7 @@ const App: React.FC = () => {
               teamMembers={TEAM_MEMBERS}
               onTaskStatusChange={handleTaskStatusChange}
               onWorkPackageDoubleClick={handleWorkPackageDoubleClick}
+              defaultSortKey={defaultKanbanSort}
             />
         )}
       </main>
@@ -159,6 +161,8 @@ const App: React.FC = () => {
           onChangeLang={changeLanguage}
           kanbanColumns={kanbanColumns}
           onChangeKanbanColumns={setKanbanColumns}
+          defaultKanbanSort={defaultKanbanSort}
+          onChangeDefaultKanbanSort={setDefaultKanbanSort}
         />
       )}
       {selectedWorkPackageInfo && (

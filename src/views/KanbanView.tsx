@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TaskWorkPackage, TeamMember, Priority } from '../types';
+import type { TaskWorkPackage, TeamMember, Priority, SortKey } from '../types';
 import { getPriorityClasses } from '../utils/styleUtils';
 
 
@@ -8,6 +8,7 @@ interface KanbanViewProps {
   columns: string[];
   tasks: TaskWorkPackage[];
   teamMembers: TeamMember[];
+  defaultSortKey: SortKey;
   onTaskStatusChange: (taskId: string, newStatus: string) => void;
   onWorkPackageDoubleClick: (workPackage: TaskWorkPackage) => void;
 }
@@ -107,17 +108,15 @@ const priorityOrder: Record<Priority, number> = {
   'Baixa': 4,
 };
 
-type SortKey = 'priority' | 'title' | 'responsible';
-
 const MoreVerticalIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 );
 
 
-export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMembers, onTaskStatusChange }) => {
+export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMembers, onTaskStatusChange, defaultSortKey, onWorkPackageDoubleClick }) => {
   const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
-  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<Record<string, SortKey>>({});
   const [openSortMenu, setOpenSortMenu] = useState<string | null>(null);
   const sortMenuRef = useRef<HTMLDivElement>(null);
@@ -135,10 +134,7 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
     e.dataTransfer.setData('taskId', taskId);
     setIsDragging(true);
-    // If a card is expanded, collapse it when dragging starts
-    if (expandedTaskId) {
-        setExpandedTaskId(null);
-    }
+    setExpandedCardId(null);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -159,7 +155,7 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
   };
   
   const handleCardDoubleClick = (taskId: string) => {
-    setExpandedTaskId(currentId => (currentId === taskId ? null : taskId));
+    setExpandedCardId(currentId => currentId === taskId ? null : taskId);
   };
 
   const handleSortChange = (columnName: string, key: SortKey) => {
@@ -174,7 +170,7 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
         onDragEnd={handleDragEnd}
     >
       {columns.map(column => {
-        const sortKey = sortConfig[column];
+        const sortKey = sortConfig[column] || defaultSortKey;
 
         const tasksInColumn = tasks
             .filter(task => task.status === column)
@@ -243,18 +239,18 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
                   onDragStart={(e) => handleDragStart(e, task.id)}
                   className="animate-drop"
                 >
-                  {expandedTaskId === task.id ? (
-                      <ExpandedTaskCard 
-                        task={task} 
-                        onDoubleClick={handleCardDoubleClick} 
-                        teamMembers={teamMembers} 
-                      />
+                  { expandedCardId === task.id ? (
+                    <ExpandedTaskCard
+                      task={task}
+                      onDoubleClick={handleCardDoubleClick}
+                      teamMembers={teamMembers}
+                    />
                   ) : (
-                      <CompactTaskCard 
-                        task={task} 
-                        onDoubleClick={handleCardDoubleClick} 
-                        teamMembers={teamMembers} 
-                      />
+                    <CompactTaskCard 
+                      task={task} 
+                      onDoubleClick={handleCardDoubleClick} 
+                      teamMembers={teamMembers} 
+                    />
                   )}
                 </div>
               ))}

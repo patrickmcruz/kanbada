@@ -34,6 +34,10 @@ const resources = {
       kanbanColumns: "Kanban Columns",
       addColumn: "Add column",
       columnNamePlaceholder: "Column name...",
+      defaultColumnSort: "Default Column Sort",
+      general: "General",
+      appearance: "Appearance",
+      noWorkloadSettings: "No specific settings for this view yet.",
       // TaskDetailModal.tsx
       taskDetails: "Work Package Details",
       project: "Project",
@@ -91,6 +95,10 @@ const resources = {
       kanbanColumns: "Colunas do Kanban",
       addColumn: "Adicionar coluna",
       columnNamePlaceholder: "Nome da coluna...",
+      defaultColumnSort: "Ordenação Padrão da Coluna",
+      general: "Geral",
+      appearance: "Aparência",
+      noWorkloadSettings: "Ainda não há configurações específicas para esta visão.",
       // TaskDetailModal.tsx
       taskDetails: "Detalhes do Pacote de Trabalho",
       project: "Projeto",
