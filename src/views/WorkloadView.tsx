@@ -203,18 +203,20 @@ export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDa
         {/* --- Left Column: Responsible --- */}
         <div className="flex-shrink-0 z-10 border-r border-[var(--color-surface-2)]" style={{ width: '150px' }}>
             <div 
-              className="relative p-4 font-bold text-xs text-left uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-[var(--color-surface-2)] sticky top-0 flex items-center justify-between gap-2 group cursor-pointer"
+              className="p-4 font-bold text-xs text-left uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-[var(--color-surface-2)] sticky top-0 flex items-center justify-between gap-2 group cursor-pointer"
               onClick={() => onResponsibleSortOrderChange(responsibleSortOrder === 'asc' ? 'desc' : 'asc')}
             >
                 <div className="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                   <span>{t('responsible')}</span>
                 </div>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    {responsibleSortOrder === 'asc' ? <ArrowUpIcon /> : <ArrowDownIcon />}
-                </div>
-                <div className="absolute bottom-full -mb-2 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
-                    {t('sortResponsibleTooltip')}
+                <div className="relative">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        {responsibleSortOrder === 'asc' ? <ArrowUpIcon /> : <ArrowDownIcon />}
+                    </div>
+                    <div className="absolute top-1/2 -translate-y-1/2 right-full mr-2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
+                        {t('sortResponsibleTooltip')}
+                    </div>
                 </div>
             </div>
             {allMembers.map((member) => {
