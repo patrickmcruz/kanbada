@@ -285,7 +285,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                     onChange={(e) => setEditingValue(e.target.value)}
                                     onBlur={() => { handleUpdatePriority(p.key, { name: editingValue.trim() }); setEditingPriorityKey(null); }}
                                     onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); if (e.key === 'Escape') setEditingPriorityKey(null); }}
-                                    className="flex-1 w-full rounded-md border border-transparent hover:border-[var(--color-surface-3)] bg-[var(--color-surface-2)] focus:bg-[var(--color-back)] focus:border-[var(--color-main)] py-1.5 px-2 text-sm text-[var(--color-text-primary)] focus:outline-none"
+                                    className="flex-1 min-w-0 rounded-md border border-transparent hover:border-[var(--color-surface-3)] bg-[var(--color-surface-2)] focus:bg-[var(--color-back)] focus:border-[var(--color-main)] py-1.5 px-2 text-sm text-[var(--color-text-primary)] focus:outline-none"
                                 />
                                 <div className="relative group">
                                     <button
@@ -309,7 +309,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                             value={newPriorityName}
                             onChange={e => setNewPriorityName(e.target.value)}
                             placeholder={t('priorityName') as string}
-                            className="flex-1 w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
+                            className="flex-1 min-w-0 rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
                         />
                         <div className="relative group">
                             <button type="submit" className="px-3 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"><PlusIcon /></button>
@@ -397,7 +397,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                   value={newColumnName}
                                   onChange={(e) => setNewColumnName(e.target.value)}
                                   placeholder={t('columnNamePlaceholder') as string}
-                                  className="flex-1 w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
+                                  className="flex-1 min-w-0 rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
                               />
                               <div className="relative group">
                                 <button

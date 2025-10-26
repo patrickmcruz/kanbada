@@ -305,14 +305,14 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
                   { expandedCardId === task.id ? (
                     <ExpandedTaskCard
                       task={task}
-                      onDoubleClick={() => handleCardDoubleClick(task.id)}
+                      onDoubleClick={handleCardDoubleClick}
                       teamMembers={teamMembers}
                       priorities={priorities}
                     />
                   ) : (
                     <CompactTaskCard 
                       task={task} 
-                      onDoubleClick={() => handleCardDoubleClick(task.id)} 
+                      onDoubleClick={handleCardDoubleClick} 
                       teamMembers={teamMembers} 
                       priorities={priorities}
                     />
