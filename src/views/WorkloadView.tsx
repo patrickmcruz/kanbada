@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TaskWorkPackage, TeamMember, ViewLevel } from '../types';
+import type { TaskWorkPackage, TeamMember, ViewLevel, ResponsibleSortOrder } from '../types';
 import { generateDateColumns, getStartOfDay } from '../utils/dateUtils';
 import { WorkPackageCard } from '../components/WorkPackageCard';
 
@@ -10,7 +10,14 @@ interface WorkloadViewProps {
   workPackages: TaskWorkPackage[];
   teamMembers: TeamMember[];
   onWorkPackageDoubleClick: (workPackage: TaskWorkPackage) => void;
+  responsibleSortOrder: ResponsibleSortOrder;
+  onResponsibleSortOrderChange: (order: ResponsibleSortOrder) => void;
 }
+
+// --- Icons ---
+const ArrowUpIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>;
+const ArrowDownIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>;
+
 
 // --- Helper functions for new avatar design ---
 const avatarColors = [
@@ -30,7 +37,7 @@ const getColorForId = (id: string) => {
 const getInitials = (name: string) => name.charAt(0).toUpperCase();
 // --- End of helper functions ---
 
-export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageDoubleClick }) => {
+export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageDoubleClick, responsibleSortOrder, onResponsibleSortOrderChange }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
   const dateColumns = generateDateColumns(viewLevel, currentDate, locale);
@@ -66,10 +73,24 @@ export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDa
     }
   }, [viewLevel, currentDate, dateColumns]);
 
-  const allMembers = useMemo(() => 
-    [...teamMembers.filter(m => m.id !== 'unassigned'), ...teamMembers.filter(m => m.id === 'unassigned')],
-    [teamMembers]
-  );
+  const allMembers = useMemo(() => {
+    const sortedMembers = [...teamMembers]
+        .filter(m => m.id !== 'unassigned')
+        .sort((a, b) => {
+            const nameA = a.name.toLowerCase();
+            const nameB = b.name.toLowerCase();
+            if (responsibleSortOrder === 'asc') {
+                return nameA.localeCompare(nameB);
+            }
+            return nameB.localeCompare(nameA);
+        });
+
+    return [
+        ...sortedMembers,
+        ...teamMembers.filter(m => m.id === 'unassigned')
+    ];
+  }, [teamMembers, responsibleSortOrder]);
+
 
   const workPackageLayouts = useMemo(() => {
     const layouts = new Map<string, { stackIndex: number; maxStack: number }>();
@@ -180,9 +201,17 @@ export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDa
     <div className="bg-[var(--color-surface-1)] rounded-lg overflow-hidden border border-[var(--color-surface-2)] flex h-full">
         {/* --- Left Column: Responsible --- */}
         <div className="flex-shrink-0 z-10 border-r border-[var(--color-surface-2)]" style={{ width: '150px' }}>
-            <div className="p-4 font-bold text-xs text-left uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-[var(--color-surface-2)] sticky top-0 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span>{t('responsible')}</span>
+            <div 
+              className="p-4 font-bold text-xs text-left uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-[var(--color-surface-2)] sticky top-0 flex items-center justify-between gap-2 group cursor-pointer"
+              onClick={() => onResponsibleSortOrderChange(responsibleSortOrder === 'asc' ? 'desc' : 'asc')}
+            >
+                <div className="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  <span>{t('responsible')}</span>
+                </div>
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    {responsibleSortOrder === 'asc' ? <ArrowUpIcon /> : <ArrowDownIcon />}
+                </div>
             </div>
             {allMembers.map((member) => {
                 if (member.id === 'unassigned') {

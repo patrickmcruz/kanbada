@@ -7,7 +7,7 @@ import { SetupScreen } from './components/SetupScreen';
 import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { useWorkload } from './hooks/useWorkload';
 import { TEAM_MEMBERS } from './data/team';
-import type { ViewLevel, TaskWorkPackage, AppView, SortKey } from './types';
+import type { ViewLevel, TaskWorkPackage, AppView, SortKey, ResponsibleSortOrder } from './types';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -35,6 +35,7 @@ const App: React.FC = () => {
     setFilterPriority,
     handleTaskStatusChange,
     handleRenameColumnTasks,
+    handleMoveTasks,
   } = useWorkload(currentDate);
 
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
@@ -45,6 +46,8 @@ const App: React.FC = () => {
   const [defaultKanbanSort, setDefaultKanbanSort] = useState<SortKey>('priority');
   const [selectedWorkPackageInfo, setSelectedWorkPackageInfo] = useState<SelectedWorkPackageInfo | null>(null);
   const [sprintDays, setSprintDays] = useState<number>(7);
+  const [responsibleSortOrder, setResponsibleSortOrder] = useState<ResponsibleSortOrder>('asc');
+
 
   useEffect(() => {
     document.body.className = `theme-${theme}`;
@@ -83,8 +86,9 @@ const App: React.FC = () => {
   };
 
   const handleDeleteKanbanColumn = (columnToDelete: string) => {
-    const isColumnEmpty = !allTasks.some(task => task.status === columnToDelete);
-    if (isColumnEmpty) {
+    const toDoColumn = kanbanColumns[0];
+    if (columnToDelete !== toDoColumn) {
+      handleMoveTasks(columnToDelete, toDoColumn);
       setKanbanColumns(prev => prev.filter(c => c !== columnToDelete));
     }
   };
@@ -160,6 +164,8 @@ const App: React.FC = () => {
               workPackages={filteredTasks}
               teamMembers={TEAM_MEMBERS}
               onWorkPackageDoubleClick={handleWorkPackageDoubleClick}
+              responsibleSortOrder={responsibleSortOrder}
+              onResponsibleSortOrderChange={setResponsibleSortOrder}
             />
         ) : (
             <KanbanView 
@@ -190,6 +196,8 @@ const App: React.FC = () => {
           onChangeDefaultKanbanSort={setDefaultKanbanSort}
           sprintDays={sprintDays}
           onChangeSprintDays={setSprintDays}
+          responsibleSortOrder={responsibleSortOrder}
+          onChangeResponsibleSortOrder={setResponsibleSortOrder}
         />
       )}
       {selectedWorkPackageInfo && (

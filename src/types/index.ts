@@ -3,6 +3,7 @@
 export type ViewLevel = 'Day' | 'Week' | 'Month';
 export type AppView = 'Workload' | 'Kanban';
 export type SortKey = 'priority' | 'title' | 'responsible';
+export type ResponsibleSortOrder = 'asc' | 'desc';
 
 export interface TeamMember {
   id: string;

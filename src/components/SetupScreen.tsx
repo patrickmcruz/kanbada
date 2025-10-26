@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SortKey, TaskWorkPackage } from '../types';
+import type { SortKey, TaskWorkPackage, ResponsibleSortOrder } from '../types';
 
 interface SetupScreenProps {
   onClose: () => void;
@@ -17,6 +17,8 @@ interface SetupScreenProps {
   onChangeDefaultKanbanSort: (sortKey: SortKey) => void;
   sprintDays: number;
   onChangeSprintDays: (days: number) => void;
+  responsibleSortOrder: ResponsibleSortOrder;
+  onChangeResponsibleSortOrder: (order: ResponsibleSortOrder) => void;
 }
 
 type SetupTab = 'general' | 'workload' | 'kanban';
@@ -52,14 +54,41 @@ const Section: React.FC<{title: string, children: React.ReactNode}> = ({ title, 
     </div>
 );
 
+const ConfirmationDialog: React.FC<{ title: string; message: string; onConfirm: () => void; onCancel: () => void; }> = ({ title, message, onConfirm, onCancel }) => {
+    const { t } = useTranslation();
+    return (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center animate-modal-in">
+            <div className="bg-[var(--color-surface-1)] rounded-lg shadow-xl p-6 w-full max-w-sm m-4">
+                <h3 className="text-lg font-bold text-[var(--color-text-primary)]">{title}</h3>
+                <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{message}</p>
+                <div className="mt-6 flex justify-end gap-3">
+                    <button
+                        onClick={onCancel}
+                        className="px-4 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]"
+                    >
+                        {t('cancel')}
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="px-4 py-2 text-sm font-semibold rounded-md transition-colors bg-red-600 text-white hover:bg-red-700"
+                    >
+                        {t('confirm')}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
-export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, onRenameKanbanColumn, allTasks, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays }) => {
+
+export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, onRenameKanbanColumn, allTasks, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays, responsibleSortOrder, onChangeResponsibleSortOrder }) => {
   const { t } = useTranslation();
   const [newColumnName, setNewColumnName] = useState('');
   const [activeTab, setActiveTab] = useState<SetupTab>('general');
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [editingColumn, setEditingColumn] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
+  const [columnPendingDeletion, setColumnPendingDeletion] = useState<string | null>(null);
   const dragTargetRef = React.useRef<HTMLDivElement | null>(null);
 
   const handleAddColumn = (e: React.FormEvent) => {
@@ -122,6 +151,13 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
     }
   };
 
+  const handleDeleteConfirm = () => {
+    if (columnPendingDeletion) {
+        onDeleteKanbanColumn(columnPendingDeletion);
+        setColumnPendingDeletion(null);
+    }
+  };
+
   const renderContent = () => {
       switch(activeTab) {
           case 'general':
@@ -170,18 +206,34 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
               );
           case 'workload':
               return (
-                  <Section title={t('workload')}>
-                      <p className="text-sm text-[var(--color-text-secondary)] italic">{t('noWorkloadSettings')}</p>
-                  </Section>
+                <Section title={t('workload')}>
+                    <fieldset>
+                        <legend className="text-md font-medium text-[var(--color-text-primary)] mb-3">{t('defaultResponsibleSort')}</legend>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => onChangeResponsibleSortOrder('asc')}
+                                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${responsibleSortOrder === 'asc' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
+                                aria-pressed={responsibleSortOrder === 'asc'}
+                            >
+                                {t('az')}
+                            </button>
+                            <button
+                                onClick={() => onChangeResponsibleSortOrder('desc')}
+                                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${responsibleSortOrder === 'desc' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
+                                aria-pressed={responsibleSortOrder === 'desc'}
+                            >
+                                {t('za')}
+                            </button>
+                        </div>
+                    </fieldset>
+                </Section>
               );
           case 'kanban':
               return (
                   <div className="space-y-8">
                       <Section title={t('kanbanColumns')}>
                           <div className='space-y-2 max-h-48 overflow-y-auto pr-2'>
-                              {kanbanColumns.map((column, index) => {
-                                const tasksInColumn = allTasks.some(task => task.status === column);
-                                return (
+                              {kanbanColumns.map((column, index) => (
                                 <div 
                                     key={column}
                                     draggable
@@ -206,23 +258,16 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                             <span onDoubleClick={() => handleStartEditing(column)} className="py-0.5">{t(column)}</span>
                                         )}
                                     </div>
-                                    <div className="relative group">
-                                        <button 
-                                            onClick={() => onDeleteKanbanColumn(column)}
-                                            className={`p-1 rounded-full text-red-400 ${tasksInColumn ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500/20'}`}
-                                            aria-label={`Delete ${column}`}
-                                            disabled={tasksInColumn}
-                                        >
-                                            <TrashIcon />
-                                        </button>
-                                        {tasksInColumn && (
-                                            <div className="absolute bottom-full right-0 mb-2 w-max px-2 py-1 bg-[var(--color-surface-3)] text-[var(--color-text-primary)] text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                                                {t('deleteColumnError')}
-                                            </div>
-                                        )}
-                                    </div>
+                                    <button 
+                                        onClick={() => setColumnPendingDeletion(column)}
+                                        className="p-1 rounded-full text-red-400 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                        aria-label={`Delete ${column}`}
+                                        disabled={index === 0}
+                                    >
+                                        <TrashIcon />
+                                    </button>
                               </div>
-                              )})}
+                              ))}
                           </div>
                           <form onSubmit={handleAddColumn} className="flex gap-2 mt-4">
                               <input 
@@ -275,49 +320,59 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
 
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" 
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="setup-title"
-    >
+    <>
       <div 
-        className="bg-[var(--color-surface-1)] text-[var(--color-text-primary)] rounded-lg shadow-2xl w-full max-w-3xl m-4 animate-modal-in flex flex-col max-h-[90vh]"
-        onClick={e => e.stopPropagation()}
+        className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" 
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="setup-title"
       >
-        <header className="flex items-center justify-between p-4 border-b border-[var(--color-surface-2)] flex-shrink-0">
-          <h2 id="setup-title" className="text-xl font-bold">{t('setup')}</h2>
-          <button 
-            onClick={onClose} 
-            className="p-1 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)] cursor-pointer"
-            aria-label={t('close')}
-          >
-            <XIcon />
-          </button>
-        </header>
+        <div 
+          className="bg-[var(--color-surface-1)] text-[var(--color-text-primary)] rounded-lg shadow-2xl w-full max-w-3xl m-4 animate-modal-in flex flex-col max-h-[90vh]"
+          onClick={e => e.stopPropagation()}
+        >
+          <header className="flex items-center justify-between p-4 border-b border-[var(--color-surface-2)] flex-shrink-0">
+            <h2 id="setup-title" className="text-xl font-bold">{t('setup')}</h2>
+            <button 
+              onClick={onClose} 
+              className="p-1 rounded-full text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)] cursor-pointer"
+              aria-label={t('close')}
+            >
+              <XIcon />
+            </button>
+          </header>
 
-        <div className="flex flex-1 overflow-hidden">
-            <nav className="w-1/3 md:w-1/4 p-4 border-r border-[var(--color-surface-2)] space-y-2 overflow-y-auto">
-                <TabButton icon={<GeneralIcon/>} label={t('general')} isActive={activeTab === 'general'} onClick={() => setActiveTab('general')} />
-                <TabButton icon={<WorkloadIcon/>} label={t('workload')} isActive={activeTab === 'workload'} onClick={() => setActiveTab('workload')} />
-                <TabButton icon={<KanbanIcon/>} label={t('kanban')} isActive={activeTab === 'kanban'} onClick={() => setActiveTab('kanban')} />
-            </nav>
-            
-            <main className="flex-1 p-6 space-y-8 overflow-y-auto h-[430px]">
-                {renderContent()}
-            </main>
+          <div className="flex flex-1 overflow-hidden">
+              <nav className="w-1/3 md:w-1/4 p-4 border-r border-[var(--color-surface-2)] space-y-2 overflow-y-auto">
+                  <TabButton icon={<GeneralIcon/>} label={t('general')} isActive={activeTab === 'general'} onClick={() => setActiveTab('general')} />
+                  <TabButton icon={<WorkloadIcon/>} label={t('workload')} isActive={activeTab === 'workload'} onClick={() => setActiveTab('workload')} />
+                  <TabButton icon={<KanbanIcon/>} label={t('kanban')} isActive={activeTab === 'kanban'} onClick={() => setActiveTab('kanban')} />
+              </nav>
+              
+              <main className="flex-1 p-6 space-y-8 overflow-y-auto h-[430px]">
+                  {renderContent()}
+              </main>
+          </div>
+          
+          <footer className="p-4 border-t border-[var(--color-surface-2)] flex justify-end flex-shrink-0">
+               <button
+                  onClick={onClose}
+                  className="px-4 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110"
+                >
+                  {t('close')}
+                </button>
+          </footer>
         </div>
-        
-        <footer className="p-4 border-t border-[var(--color-surface-2)] flex justify-end flex-shrink-0">
-             <button
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110"
-              >
-                {t('close')}
-              </button>
-        </footer>
       </div>
-    </div>
+      {columnPendingDeletion && (
+        <ConfirmationDialog
+            title={t('deleteColumnConfirmTitle')}
+            message={t('deleteColumnConfirmMessage', { columnName: t(columnPendingDeletion), toDoColumnName: t(kanbanColumns[0]) })}
+            onConfirm={handleDeleteConfirm}
+            onCancel={() => setColumnPendingDeletion(null)}
+        />
+      )}
+    </>
   );
 };

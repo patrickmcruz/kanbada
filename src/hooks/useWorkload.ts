@@ -83,6 +83,26 @@ export const useWorkload = (currentDate: Date) => {
         });
         setWorkPackages(updatedWorkPackages);
     };
+    
+    const handleMoveTasks = (fromStatus: string, toStatus: string) => {
+        const updatedWorkPackages = workPackages.map(container => {
+            const updateTasks = (tasks: TaskWorkPackage[]) => tasks.map(task =>
+                task.status === fromStatus ? { ...task, status: toStatus } : task
+            );
+
+            if (container.type === 'Project') {
+                return {
+                    ...container,
+                    phases: container.phases.map(phase => ({ ...phase, tasks: updateTasks(phase.tasks) }))
+                };
+            }
+            if (container.type === 'Demand') {
+                return { ...container, tasks: updateTasks(container.tasks) };
+            }
+            return container;
+        });
+        setWorkPackages(updatedWorkPackages);
+    };
 
 
     const filteredTasks = useMemo(() => {
@@ -131,5 +151,6 @@ export const useWorkload = (currentDate: Date) => {
         setFilterPriority,
         handleTaskStatusChange,
         handleRenameColumnTasks,
+        handleMoveTasks,
     };
 };
