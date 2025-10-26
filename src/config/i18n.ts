@@ -57,6 +57,9 @@ const resources = {
       deletePriorityError: "This priority is in use and cannot be deleted.",
       delete: "Delete",
       deleteFirstColumnError: "The first column cannot be deleted.",
+      resetSettings: "Reset Settings",
+      resetConfirmTitle: "Confirm Reset",
+      resetConfirmMessage: "Are you sure you want to reset all settings to their defaults? This action cannot be undone.",
       // TaskDetailModal.tsx
       taskDetails: "Work Package Details",
       project: "Project",
@@ -147,6 +150,9 @@ const resources = {
       deletePriorityError: "Esta prioridade está em uso e não pode ser excluída.",
       delete: "Excluir",
       deleteFirstColumnError: "A primeira coluna não pode ser excluída.",
+      resetSettings: "Redefinir Configurações",
+      resetConfirmTitle: "Confirmar Redefinição",
+      resetConfirmMessage: "Tem certeza de que deseja redefinir todas as configurações para os padrões? Esta ação não pode ser desfeita.",
       // TaskDetailModal.tsx
       taskDetails: "Detalhes do Pacote de Trabalho",
       project: "Projeto",

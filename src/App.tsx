@@ -8,6 +8,7 @@ import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { useWorkload } from './hooks/useWorkload';
 import { TEAM_MEMBERS } from './data/team';
 import type { ViewLevel, TaskWorkPackage, AppView, SortKey, ResponsibleSortOrder, PriorityDefinition } from './types';
+import i18n from './config/i18n';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -15,16 +16,18 @@ interface SelectedWorkPackageInfo {
   projectTitle: string;
 }
 
+const getInitialPriorities = (): PriorityDefinition[] => [
+  { key: 'urgent', name: i18n.t('urgent'), color: '#a855f7' },
+  { key: 'high', name: i18n.t('high'), color: '#ef4444' },
+  { key: 'medium', name: i18n.t('medium'), color: '#eab308' },
+  { key: 'low', name: i18n.t('low'), color: '#3b82f6' },
+];
+
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const [priorities, setPriorities] = useState<PriorityDefinition[]>(() => [
-    { key: 'urgent', name: t('urgent'), color: '#a855f7' }, // purple-500
-    { key: 'high', name: t('high'), color: '#ef4444' }, // red-500
-    { key: 'medium', name: t('medium'), color: '#eab308' }, // yellow-500
-    { key: 'low', name: t('low'), color: '#3b82f6' }, // blue-500
-  ]);
+  const [priorities, setPriorities] = useState<PriorityDefinition[]>(getInitialPriorities);
 
   const {
     workPackages,
@@ -107,6 +110,16 @@ const App: React.FC = () => {
     handleRenameColumnTasks(oldName, newName);
     setKanbanColumns(prev => prev.map(col => col === oldName ? newName : col));
     return true; // Indicate success
+  };
+
+  const handleResetSettings = () => {
+    setTheme('dark');
+    changeLanguage('pt');
+    setKanbanColumns(['backlog', 'sprint', 'toDo', 'doing', 'review', 'done']);
+    setDefaultKanbanSort('priority');
+    setSprintDays(7);
+    setResponsibleSortOrder('asc');
+    setPriorities(getInitialPriorities());
   };
 
 
@@ -215,6 +228,7 @@ const App: React.FC = () => {
           onChangeResponsibleSortOrder={setResponsibleSortOrder}
           priorities={priorities}
           onChangePriorities={setPriorities}
+          onResetSettings={handleResetSettings}
         />
       )}
       {selectedWorkPackageInfo && (

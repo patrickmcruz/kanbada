@@ -21,6 +21,7 @@ interface SetupScreenProps {
   onChangeResponsibleSortOrder: (order: ResponsibleSortOrder) => void;
   priorities: PriorityDefinition[];
   onChangePriorities: (priorities: PriorityDefinition[]) => void;
+  onResetSettings: () => void;
 }
 
 type SetupTab = 'general' | 'workload' | 'kanban';
@@ -106,7 +107,7 @@ const ConfirmationDialog: React.FC<{ title: string; message: string; onConfirm: 
 };
 
 
-export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, onRenameKanbanColumn, allTasks, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays, responsibleSortOrder, onChangeResponsibleSortOrder, priorities, onChangePriorities }) => {
+export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, onRenameKanbanColumn, allTasks, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays, responsibleSortOrder, onChangeResponsibleSortOrder, priorities, onChangePriorities, onResetSettings }) => {
   const { t } = useTranslation();
   const [newColumnName, setNewColumnName] = useState('');
   const [activeTab, setActiveTab] = useState<SetupTab>('general');
@@ -119,6 +120,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
   const [draggedPriorityIndex, setDraggedPriorityIndex] = useState<number | null>(null);
   const [editingPriorityKey, setEditingPriorityKey] = useState<string | null>(null);
   const [newPriorityName, setNewPriorityName] = useState('');
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   const handleAddColumn = (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,6 +187,11 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
         onDeleteKanbanColumn(columnPendingDeletion);
         setColumnPendingDeletion(null);
     }
+  };
+
+  const handleResetConfirm = () => {
+    onResetSettings();
+    setIsResetConfirmOpen(false);
   };
 
   // --- Priority Handlers ---
@@ -321,6 +328,14 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                 </div>
                             </form>
                         </div>
+                    </div>
+                    <div className="pt-4 border-t border-[var(--color-surface-2)]">
+                        <button
+                            onClick={() => setIsResetConfirmOpen(true)}
+                            className="text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+                        >
+                            {t('resetSettings')}
+                        </button>
                     </div>
                 </div>
               );
@@ -498,6 +513,14 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
             message={t('deleteColumnConfirmMessage', { columnName: t(columnPendingDeletion), toDoColumnName: t(kanbanColumns[0]) })}
             onConfirm={handleDeleteConfirm}
             onCancel={() => setColumnPendingDeletion(null)}
+        />
+      )}
+      {isResetConfirmOpen && (
+        <ConfirmationDialog
+            title={t('resetConfirmTitle')}
+            message={t('resetConfirmMessage')}
+            onConfirm={handleResetConfirm}
+            onCancel={() => setIsResetConfirmOpen(false)}
         />
       )}
     </>
