@@ -63,6 +63,7 @@ const resources = {
       priority: "Priority",
       tasks: "Tasks",
       // Default Kanban Columns
+      backlog: "Backlog",
       toDo: "To Do",
       sprint: "Sprint",
       doing: "Doing",
@@ -134,6 +135,7 @@ const resources = {
       priority: "Prioridade",
       tasks: "Tarefas",
       // Default Kanban Columns
+      backlog: "Backlog",
       toDo: "A Fazer",
       sprint: "Sprint",
       doing: "Em Andamento",

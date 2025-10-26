@@ -40,7 +40,7 @@ const App: React.FC = () => {
 
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
   const [activeView, setActiveView] = useState<AppView>('Workload');
-  const [kanbanColumns, setKanbanColumns] = useState<string[]>(['toDo', 'sprint', 'doing', 'done']);
+  const [kanbanColumns, setKanbanColumns] = useState<string[]>(['backlog', 'sprint', 'toDo', 'doing', 'done']);
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [defaultKanbanSort, setDefaultKanbanSort] = useState<SortKey>('priority');
