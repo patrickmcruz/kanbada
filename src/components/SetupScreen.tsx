@@ -29,7 +29,7 @@ type SetupTab = 'general' | 'workload' | 'kanban';
 const XIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
 const PlusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
 const TrashIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>;
-const GeneralIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+const GeneralIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>;
 const WorkloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>;
 const KanbanIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M6 3v18"/><path d="M18 3v18"/></svg>;
 const GripVerticalIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--color-text-secondary)]"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>;
@@ -49,12 +49,35 @@ const TabButton: React.FC<{ icon: React.ReactNode; label: string; isActive: bool
   </button>
 );
 
-const Section: React.FC<{title: string, children: React.ReactNode}> = ({ title, children }) => (
-    <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)] border-b border-[var(--color-surface-2)] pb-2">{title}</h3>
-        {children}
+const ToggleSwitch: React.FC<{
+  options: { label: string; value: string }[];
+  currentValue: string;
+  onChange: (value: string) => void;
+}> = ({ options, currentValue, onChange }) => (
+  <div className="flex bg-[var(--color-surface-3)] p-0.5 rounded-lg w-full">
+    {options.map(option => (
+      <button
+        key={option.value}
+        onClick={() => onChange(option.value)}
+        className={`w-full px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+          currentValue === option.value
+            ? 'bg-[var(--color-main)] text-white shadow'
+            : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+        }`}
+      >
+        {option.label}
+      </button>
+    ))}
+  </div>
+);
+
+const SettingRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+    <div className="flex items-center justify-between gap-4 py-3 border-b border-[var(--color-surface-2)] last:border-b-0">
+        <label className="text-sm font-medium text-[var(--color-text-secondary)] truncate pr-4">{label}</label>
+        <div className="w-36 flex-shrink-0">{children}</div>
     </div>
 );
+
 
 const ConfirmationDialog: React.FC<{ title: string; message: string; onConfirm: () => void; onCancel: () => void; }> = ({ title, message, onConfirm, onCancel }) => {
     const { t } = useTranslation();
@@ -188,7 +211,6 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
 
     const handleDeletePriority = (key: string) => {
         if (isPriorityInUse(key)) {
-            alert(t('deletePriorityError'));
             return;
         }
         onChangePriorities(priorities.filter(p => p.key !== key));
@@ -217,139 +239,113 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
       switch(activeTab) {
           case 'general':
               return (
-                <div className="space-y-8">
-                <Section title={t('appearance')}>
-                  <fieldset>
-                    <legend className="text-md font-medium text-[var(--color-text-primary)] mb-3">{t('theme')}</legend>
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => onChangeTheme('dark')}
-                        className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${currentTheme === 'dark' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
-                        aria-pressed={currentTheme === 'dark'}
-                      >
-                        {t('dark')}
-                      </button>
-                      <button
-                        onClick={() => onChangeTheme('light')}
-                        className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${currentTheme === 'light' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
-                        aria-pressed={currentTheme === 'light'}
-                      >
-                        {t('light')}
-                      </button>
-                    </div>
-                  </fieldset>
-
-                  <fieldset>
-                    <legend className="text-md font-medium text-[var(--color-text-primary)] mb-3">{t('language')}</legend>
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => onChangeLang('en')}
-                        className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${currentLang === 'en' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
-                        aria-pressed={currentLang === 'en'}
-                      >
-                        EN
-                      </button>
-                      <button
-                        onClick={() => onChangeLang('pt')}
-                        className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${currentLang.startsWith('pt') ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
-                        aria-pressed={currentLang.startsWith('pt')}
-                      >
-                        PT
-                      </button>
-                    </div>
-                  </fieldset>
-                </Section>
-                <Section title={t('priorities')}>
-                    <div className='space-y-2 max-h-96 overflow-y-auto pr-2'>
-                        {priorities.map((p, index) => (
-                            <div
-                                key={p.key}
-                                draggable
-                                onDragStart={(e) => handlePriorityDragStart(e, index)}
-                                onDragOver={(e) => handlePriorityDragOver(e, index)}
-                                onDragEnd={handlePriorityDragEnd}
-                                className={`flex items-center gap-2 p-2 rounded-md transition-opacity bg-[var(--color-surface-2)] ${draggedPriorityIndex === index ? 'opacity-30' : ''}`}
-                            >
-                                <div className="cursor-grab active:cursor-grabbing"><GripVerticalIcon /></div>
-                                <span className="text-sm font-semibold text-[var(--color-text-secondary)] w-6 text-center">{index + 1}</span>
-                                <input
-                                    type="color"
-                                    value={p.color}
-                                    onChange={(e) => handleUpdatePriority(p.key, { color: e.target.value })}
-                                    className="w-8 h-8 rounded-md bg-transparent border-none cursor-pointer"
+                <div className="space-y-6">
+                    <div>
+                        <h3 className="text-md font-semibold text-[var(--color-text-primary)] mb-2">{t('appearance')}</h3>
+                        <div className="bg-[var(--color-surface-2)] rounded-lg px-4">
+                            <SettingRow label={t('theme')}>
+                                <ToggleSwitch
+                                    options={[{ label: t('dark'), value: 'dark' }, { label: t('light'), value: 'light' }]}
+                                    currentValue={currentTheme}
+                                    onChange={(v) => onChangeTheme(v as 'dark' | 'light')}
                                 />
+                            </SettingRow>
+                            <SettingRow label={t('language')}>
+                                <ToggleSwitch
+                                    options={[{ label: 'EN', value: 'en' }, { label: 'PT', value: 'pt' }]}
+                                    currentValue={currentLang.startsWith('pt') ? 'pt' : 'en'}
+                                    onChange={onChangeLang}
+                                />
+                            </SettingRow>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 className="text-md font-semibold text-[var(--color-text-primary)] mb-2">{t('priorities')}</h3>
+                        <div className="bg-[var(--color-surface-2)] rounded-lg p-3 space-y-3">
+                            <div className='space-y-2 max-h-60 overflow-y-auto pr-2'>
+                                {priorities.map((p, index) => (
+                                    <div
+                                        key={p.key}
+                                        draggable
+                                        onDragStart={(e) => handlePriorityDragStart(e, index)}
+                                        onDragOver={(e) => handlePriorityDragOver(e, index)}
+                                        onDragEnd={handlePriorityDragEnd}
+                                        className={`flex items-center gap-2 p-1 rounded-md transition-opacity bg-[var(--color-surface-3)] ${draggedPriorityIndex === index ? 'opacity-30' : ''}`}
+                                    >
+                                        <div className="cursor-grab active:cursor-grabbing"><GripVerticalIcon /></div>
+                                        <span className="text-xs font-semibold text-[var(--color-text-secondary)] w-5 text-center">{index + 1}</span>
+                                        <input
+                                            type="color"
+                                            value={p.color}
+                                            onChange={(e) => handleUpdatePriority(p.key, { color: e.target.value })}
+                                            className="w-7 h-7 rounded-md bg-transparent border-none cursor-pointer p-0"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={editingPriorityKey === p.key ? editingValue : p.name}
+                                            onFocus={() => { setEditingPriorityKey(p.key); setEditingValue(p.name); }}
+                                            onChange={(e) => setEditingValue(e.target.value)}
+                                            onBlur={() => { handleUpdatePriority(p.key, { name: editingValue.trim() }); setEditingPriorityKey(null); }}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); if (e.key === 'Escape') setEditingPriorityKey(null); }}
+                                            className="flex-1 min-w-0 rounded-md border border-transparent hover:border-[var(--color-surface-3)] bg-transparent focus:bg-[var(--color-back)] focus:border-[var(--color-main)] py-1 px-2 text-sm text-[var(--color-text-primary)] focus:outline-none"
+                                        />
+                                        <div className="relative group">
+                                            <button
+                                                onClick={() => handleDeletePriority(p.key)}
+                                                disabled={isPriorityInUse(p.key)}
+                                                className="p-1 rounded-full text-red-400 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                                aria-label={`Delete ${p.name}`}
+                                            >
+                                                <TrashIcon />
+                                            </button>
+                                            <div className="absolute top-1/2 -translate-y-1/2 right-full mr-2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                {isPriorityInUse(p.key) ? t('deletePriorityError') : t('delete')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <form onSubmit={handleAddPriority} className="flex gap-2">
                                 <input
                                     type="text"
-                                    value={editingPriorityKey === p.key ? editingValue : p.name}
-                                    onFocus={() => { setEditingPriorityKey(p.key); setEditingValue(p.name); }}
-                                    onChange={(e) => setEditingValue(e.target.value)}
-                                    onBlur={() => { handleUpdatePriority(p.key, { name: editingValue.trim() }); setEditingPriorityKey(null); }}
-                                    onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); if (e.key === 'Escape') setEditingPriorityKey(null); }}
-                                    className="flex-1 min-w-0 rounded-md border border-transparent hover:border-[var(--color-surface-3)] bg-[var(--color-surface-2)] focus:bg-[var(--color-back)] focus:border-[var(--color-main)] py-1.5 px-2 text-sm text-[var(--color-text-primary)] focus:outline-none"
+                                    value={newPriorityName}
+                                    onChange={e => setNewPriorityName(e.target.value)}
+                                    placeholder={t('priorityName') as string}
+                                    className="flex-1 min-w-0 rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-1.5 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
                                 />
                                 <div className="relative group">
-                                    <button
-                                        onClick={() => handleDeletePriority(p.key)}
-                                        disabled={isPriorityInUse(p.key)}
-                                        className="p-1 rounded-full text-red-400 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                                        aria-label={`Delete ${p.name}`}
-                                    >
-                                        <TrashIcon />
-                                    </button>
-                                    <div className="absolute top-1/2 -translate-y-1/2 right-full mr-2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                        {isPriorityInUse(p.key) ? t('deletePriorityError') : t('delete')}
+                                    <button type="submit" className="px-2 py-1.5 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"><PlusIcon /></button>
+                                    <div className="absolute bottom-full mb-1 right-1/2 translate-x-1/2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                        {t('addPriority')}
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                    <form onSubmit={handleAddPriority} className="flex gap-2 mt-4">
-                        <input
-                            type="text"
-                            value={newPriorityName}
-                            onChange={e => setNewPriorityName(e.target.value)}
-                            placeholder={t('priorityName') as string}
-                            className="flex-1 min-w-0 rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
-                        />
-                        <div className="relative group">
-                            <button type="submit" className="px-3 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"><PlusIcon /></button>
-                            <div className="absolute bottom-full mb-1 right-1/2 translate-x-1/2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                                {t('addPriority')}
-                            </div>
+                            </form>
                         </div>
-                    </form>
-                </Section>
+                    </div>
                 </div>
               );
           case 'workload':
               return (
-                <Section title={t('workload')}>
-                    <fieldset>
-                        <legend className="text-md font-medium text-[var(--color-text-primary)] mb-3">{t('defaultResponsibleSort')}</legend>
-                        <div className="flex gap-4">
-                            <button
-                                onClick={() => onChangeResponsibleSortOrder('asc')}
-                                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${responsibleSortOrder === 'asc' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
-                                aria-pressed={responsibleSortOrder === 'asc'}
-                            >
-                                {t('az')}
-                            </button>
-                            <button
-                                onClick={() => onChangeResponsibleSortOrder('desc')}
-                                className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors cursor-pointer ${responsibleSortOrder === 'desc' ? 'bg-[var(--color-main)] text-white' : 'bg-[var(--color-surface-2)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]'}`}
-                                aria-pressed={responsibleSortOrder === 'desc'}
-                            >
-                                {t('za')}
-                            </button>
-                        </div>
-                    </fieldset>
-                </Section>
+                 <div>
+                    <h3 className="text-md font-semibold text-[var(--color-text-primary)] mb-2">{t('defaultResponsibleSort')}</h3>
+                    <div className="bg-[var(--color-surface-2)] rounded-lg px-4">
+                        <SettingRow label={t('chooseSortOrder')}>
+                            <ToggleSwitch
+                                options={[{ label: t('az'), value: 'asc' }, { label: t('za'), value: 'desc' }]}
+                                currentValue={responsibleSortOrder}
+                                onChange={(v) => onChangeResponsibleSortOrder(v as ResponsibleSortOrder)}
+                            />
+                        </SettingRow>
+                    </div>
+                </div>
               );
           case 'kanban':
               return (
-                  <div className="space-y-8">
-                      <Section title={t('kanbanColumns')}>
-                          <div className='space-y-2 max-h-96 overflow-y-auto pr-2'>
+                  <div className="space-y-6">
+                      <div>
+                          <h3 className="text-md font-semibold text-[var(--color-text-primary)] mb-2">{t('kanbanColumns')}</h3>
+                          <div className="bg-[var(--color-surface-2)] rounded-lg p-3 space-y-3">
+                            <div className='space-y-2 max-h-96 overflow-y-auto pr-2'>
                               {kanbanColumns.map((column, index) => (
                                 <div 
                                     key={column}
@@ -357,9 +353,9 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                     onDragStart={(e) => handleDragStart(e, index)}
                                     onDragOver={(e) => handleDragOver(e, index)}
                                     onDragEnd={handleDragEnd}
-                                    className={`flex items-center justify-between bg-[var(--color-surface-2)] p-2 rounded-md transition-opacity ${draggedIndex === index ? 'opacity-30' : 'opacity-100'}`}
+                                    className={`flex items-center justify-between bg-[var(--color-surface-3)] p-1 rounded-md transition-opacity ${draggedIndex === index ? 'opacity-30' : 'opacity-100'}`}
                                 >
-                                    <div className="flex items-center gap-2 text-sm cursor-grab active:cursor-grabbing">
+                                    <div className="flex items-center gap-2 text-sm cursor-grab active:cursor-grabbing flex-1 min-w-0">
                                         <GripVerticalIcon />
                                         {editingColumn === column ? (
                                             <input
@@ -369,10 +365,10 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                                 onBlur={handleFinishEditing}
                                                 onKeyDown={handleKeyDown}
                                                 autoFocus
-                                                className="bg-[var(--color-surface-3)] border border-[var(--color-main)] focus:outline-none text-sm rounded px-1 py-0.5"
+                                                className="bg-[var(--color-surface-2)] border border-[var(--color-main)] focus:outline-none text-sm rounded px-1 py-0.5 w-full"
                                             />
                                         ) : (
-                                            <span onDoubleClick={() => handleStartEditing(column)} className="py-0.5">{t(column)}</span>
+                                            <span onDoubleClick={() => handleStartEditing(column)} className="py-0.5 truncate">{t(column)}</span>
                                         )}
                                     </div>
                                     <div className="relative group">
@@ -391,18 +387,18 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                               </div>
                               ))}
                           </div>
-                          <form onSubmit={handleAddColumn} className="flex gap-2 mt-4">
+                          <form onSubmit={handleAddColumn} className="flex gap-2">
                               <input 
                                   type="text"
                                   value={newColumnName}
                                   onChange={(e) => setNewColumnName(e.target.value)}
                                   placeholder={t('columnNamePlaceholder') as string}
-                                  className="flex-1 min-w-0 rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
+                                  className="flex-1 min-w-0 rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-1.5 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
                               />
                               <div className="relative group">
                                 <button
                                     type="submit"
-                                    className="px-3 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"
+                                    className="px-2 py-1.5 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"
                                     aria-label={t('addColumn')}
                                 >
                                     <PlusIcon />
@@ -412,37 +408,38 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                 </div>
                               </div>
                           </form>
-                      </Section>
-                      <Section title={t('sprintSettings')}>
-                        <div>
-                            <label htmlFor="sprint-days" className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                                {t('sprintDuration')}
-                            </label>
-                            <input
-                                type="number"
-                                id="sprint-days"
-                                value={sprintDays}
-                                onChange={(e) => onChangeSprintDays(parseInt(e.target.value, 10) || 1)}
-                                min="1"
-                                className="w-full max-w-xs rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
-                            />
-                        </div>
-                      </Section>
-                      <Section title={t('defaultColumnSort')}>
-                          <select
-                              id="default-sort"
-                              value={defaultKanbanSort}
-                              onChange={(e) => onChangeDefaultKanbanSort(e.target.value as SortKey)}
-                              className="w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
-                          >
-                              <option value="priority">{t('sortByPriority')}</option>
-                              <option value="title">{t('sortByTitle')}</option>
-                              <option value="responsible">{t('sortByResponsible')}</option>
-                              <option value="startDate">{t('sortByStartDate')}</option>
-                              <option value="endDate">{t('sortByEndDate')}</option>
-                              <option value="createdAt">{t('sortByCreationDate')}</option>
-                          </select>
-                      </Section>
+                          </div>
+                      </div>
+                      <div>
+                          <h3 className="text-md font-semibold text-[var(--color-text-primary)] mb-2">{t('kanban')}</h3>
+                          <div className="bg-[var(--color-surface-2)] rounded-lg px-4">
+                            <SettingRow label={t('sprintDuration')}>
+                                <input
+                                    type="number"
+                                    id="sprint-days"
+                                    value={sprintDays}
+                                    onChange={(e) => onChangeSprintDays(parseInt(e.target.value, 10) || 1)}
+                                    min="1"
+                                    className="w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-1.5 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
+                                />
+                            </SettingRow>
+                            <SettingRow label={t('defaultColumnSort')}>
+                                <select
+                                    id="default-sort"
+                                    value={defaultKanbanSort}
+                                    onChange={(e) => onChangeDefaultKanbanSort(e.target.value as SortKey)}
+                                    className="w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-1.5 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
+                                >
+                                    <option value="priority">{t('sortByPriority')}</option>
+                                    <option value="title">{t('sortByTitle')}</option>
+                                    <option value="responsible">{t('sortByResponsible')}</option>
+                                    <option value="startDate">{t('sortByStartDate')}</option>
+                                    <option value="endDate">{t('sortByEndDate')}</option>
+                                    <option value="createdAt">{t('sortByCreationDate')}</option>
+                                </select>
+                            </SettingRow>
+                          </div>
+                      </div>
                   </div>
               );
       }
@@ -459,7 +456,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
         aria-labelledby="setup-title"
       >
         <div 
-          className="bg-[var(--color-surface-1)] text-[var(--color-text-primary)] rounded-lg shadow-2xl w-full max-w-4xl m-4 animate-modal-in flex flex-col max-h-[90vh]"
+          className="bg-[var(--color-surface-1)] text-[var(--color-text-primary)] rounded-lg shadow-2xl w-full max-w-3xl m-4 animate-modal-in flex flex-col max-h-[90vh]"
           onClick={e => e.stopPropagation()}
         >
           <header className="flex items-center justify-between p-4 border-b border-[var(--color-surface-2)] flex-shrink-0">
@@ -474,13 +471,13 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
           </header>
 
           <div className="flex flex-1 overflow-hidden">
-              <nav className="w-1/3 md:w-1/4 p-4 border-r border-[var(--color-surface-2)] space-y-2 overflow-y-auto">
+              <nav className="w-48 flex-shrink-0 p-4 border-r border-[var(--color-surface-2)] space-y-2 overflow-y-auto">
                   <TabButton icon={<GeneralIcon/>} label={t('general')} isActive={activeTab === 'general'} onClick={() => setActiveTab('general')} />
                   <TabButton icon={<WorkloadIcon/>} label={t('workload')} isActive={activeTab === 'workload'} onClick={() => setActiveTab('workload')} />
                   <TabButton icon={<KanbanIcon/>} label={t('kanban')} isActive={activeTab === 'kanban'} onClick={() => setActiveTab('kanban')} />
               </nav>
               
-              <main className="flex-1 p-6 space-y-8 overflow-y-auto">
+              <main className="flex-1 p-6 space-y-6 overflow-y-auto">
                   {renderContent()}
               </main>
           </div>
