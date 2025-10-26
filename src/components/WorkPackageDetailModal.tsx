@@ -48,7 +48,7 @@ export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ 
       aria-labelledby="task-detail-title"
     >
       <div 
-        className="bg-[var(--color-surface-1)] text-[var(--color-text-primary)] rounded-lg shadow-2xl w-full max-w-lg m-4"
+        className="bg-[var(--color-surface-1)] text-[var(--color-text-primary)] rounded-lg shadow-2xl w-full max-w-2xl m-4"
         onClick={e => e.stopPropagation()}
       >
         <header className="flex items-center justify-between p-4 border-b border-[var(--color-surface-2)]">
@@ -88,7 +88,7 @@ export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ 
                 
                 <DetailRow label={t('startDate')} value={formatDate(workPackage.startDate)} />
                 <DetailRow label={t('endDate')} value={formatDate(workPackage.endDate)} />
-
+                <DetailRow label={t('creationDate')} value={formatDate(workPackage.createdAt)} />
                 <DetailRow label={t('duration')} value={`${duration} ${duration > 1 ? t('days') : t('day_singular')}`} />
                 <DetailRow label={t('hours')} value={`${workPackage.hours}h`} />
             </dl>

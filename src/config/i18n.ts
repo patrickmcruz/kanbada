@@ -25,6 +25,7 @@ const resources = {
       // WorkloadView.tsx
       responsible: "Responsible",
       unassigned: "Unassigned",
+      sortResponsibleTooltip: "Click to sort",
       // SetupScreen.tsx
       theme: "Theme",
       language: "Language",
@@ -53,6 +54,8 @@ const resources = {
       priorityName: "Priority Name",
       priorityColor: "Color",
       deletePriorityError: "This priority is in use and cannot be deleted.",
+      delete: "Delete",
+      deleteFirstColumnError: "The first column cannot be deleted.",
       // TaskDetailModal.tsx
       taskDetails: "Work Package Details",
       project: "Project",
@@ -60,6 +63,7 @@ const resources = {
       title: "Title",
       startDate: "Start Date",
       endDate: "End Date",
+      creationDate: "Creation Date",
       duration: "Duration",
       day_singular: "day",
       days: "days",
@@ -78,6 +82,9 @@ const resources = {
       sortByPriority: "Sort by Priority",
       sortByTitle: "Sort by Title",
       sortByResponsible: "Sort by Responsible",
+      sortByStartDate: "Sort by Start Date",
+      sortByEndDate: "Sort by End Date",
+      sortByCreationDate: "Sort by Creation Date",
       // Default priority names
       urgent: "Urgent",
       high: "High",
@@ -107,6 +114,7 @@ const resources = {
       // WorkloadView.tsx
       responsible: "Responsável",
       unassigned: "Sem responsável",
+      sortResponsibleTooltip: "Clique para ordenar",
       // SetupScreen.tsx
       theme: "Tema",
       language: "Idioma",
@@ -135,6 +143,8 @@ const resources = {
       priorityName: "Nome da Prioridade",
       priorityColor: "Cor",
       deletePriorityError: "Esta prioridade está em uso e não pode ser excluída.",
+      delete: "Excluir",
+      deleteFirstColumnError: "A primeira coluna não pode ser excluída.",
       // TaskDetailModal.tsx
       taskDetails: "Detalhes do Pacote de Trabalho",
       project: "Projeto",
@@ -142,6 +152,7 @@ const resources = {
       title: "Título",
       startDate: "Data de Início",
       endDate: "Data de Fim",
+      creationDate: "Data de Criação",
       duration: "Duração",
       day_singular: "dia",
       days: "dias",
@@ -160,6 +171,9 @@ const resources = {
       sortByPriority: "Ordenar por Prioridade",
       sortByTitle: "Ordenar por Título",
       sortByResponsible: "Ordenar por Responsável",
+      sortByStartDate: "Ordenar por Data de Início",
+      sortByEndDate: "Ordenar por Data de Fim",
+      sortByCreationDate: "Ordenar por Data de Criação",
       // Default priority names
       urgent: "Urgente",
       high: "Alta",

@@ -1,9 +1,6 @@
-
-
-
 export type ViewLevel = 'Day' | 'Week' | 'Month';
 export type AppView = 'Workload' | 'Kanban';
-export type SortKey = 'priority' | 'title' | 'responsible';
+export type SortKey = 'priority' | 'title' | 'responsible' | 'startDate' | 'endDate' | 'createdAt';
 export type ResponsibleSortOrder = 'asc' | 'desc';
 
 export interface TeamMember {
@@ -26,6 +23,7 @@ interface WorkPackageBase {
   title: string;
   startDate: Date;
   endDate: Date;
+  createdAt: Date;
 }
 
 // Project type

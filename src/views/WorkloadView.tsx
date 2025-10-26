@@ -199,11 +199,11 @@ export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDa
   const timelineGridTemplateColumns = `repeat(${dateColumns.length}, minmax(180px, 2fr))`;
 
   return (
-    <div className="bg-[var(--color-surface-1)] rounded-lg overflow-hidden border border-[var(--color-surface-2)] flex h-full">
+    <div className="bg-[var(--color-surface-1)] rounded-lg border border-[var(--color-surface-2)] flex h-full">
         {/* --- Left Column: Responsible --- */}
         <div className="flex-shrink-0 z-10 border-r border-[var(--color-surface-2)]" style={{ width: '150px' }}>
             <div 
-              className="p-4 font-bold text-xs text-left uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-[var(--color-surface-2)] sticky top-0 flex items-center justify-between gap-2 group cursor-pointer"
+              className="relative p-4 font-bold text-xs text-left uppercase tracking-wider text-[var(--color-text-secondary)] bg-[var(--color-surface-1)] border-b-2 border-[var(--color-surface-2)] sticky top-0 flex items-center justify-between gap-2 group cursor-pointer"
               onClick={() => onResponsibleSortOrderChange(responsibleSortOrder === 'asc' ? 'desc' : 'asc')}
             >
                 <div className="flex items-center gap-2">
@@ -212,6 +212,9 @@ export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDa
                 </div>
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                     {responsibleSortOrder === 'asc' ? <ArrowUpIcon /> : <ArrowDownIcon />}
+                </div>
+                <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
+                    {t('sortResponsibleTooltip')}
                 </div>
             </div>
             {allMembers.map((member) => {

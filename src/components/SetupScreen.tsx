@@ -96,7 +96,6 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
   const [draggedPriorityIndex, setDraggedPriorityIndex] = useState<number | null>(null);
   const [editingPriorityKey, setEditingPriorityKey] = useState<string | null>(null);
   const [newPriorityName, setNewPriorityName] = useState('');
-  const [newPriorityColor, setNewPriorityColor] = useState('#808080');
 
   const handleAddColumn = (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,9 +178,8 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
             return;
         }
 
-        onChangePriorities([...priorities, { key: newKey, name: trimmedName, color: newPriorityColor }]);
+        onChangePriorities([...priorities, { key: newKey, name: trimmedName, color: '#808080' }]);
         setNewPriorityName('');
-        setNewPriorityColor('#808080');
     };
 
     const handleUpdatePriority = (key: string, updates: Partial<PriorityDefinition>) => {
@@ -262,7 +260,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                   </fieldset>
                 </Section>
                 <Section title={t('priorities')}>
-                    <div className='space-y-2 max-h-48 overflow-y-auto pr-2'>
+                    <div className='space-y-2 max-h-96 overflow-y-auto pr-2'>
                         {priorities.map((p, index) => (
                             <div
                                 key={p.key}
@@ -298,11 +296,9 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                     >
                                         <TrashIcon />
                                     </button>
-                                    {isPriorityInUse(p.key) && (
-                                        <div className="absolute top-1/2 -translate-y-1/2 right-full mr-2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                            {t('deletePriorityError')}
-                                        </div>
-                                    )}
+                                    <div className="absolute top-1/2 -translate-y-1/2 right-full mr-2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                        {isPriorityInUse(p.key) ? t('deletePriorityError') : t('delete')}
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -315,13 +311,12 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                             placeholder={t('priorityName') as string}
                             className="flex-1 w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
                         />
-                        <input
-                            type="color"
-                            value={newPriorityColor}
-                            onChange={e => setNewPriorityColor(e.target.value)}
-                            className="h-auto w-12 rounded-md bg-transparent border border-[var(--color-surface-3)] cursor-pointer"
-                        />
-                        <button type="submit" className="px-3 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"><PlusIcon /></button>
+                        <div className="relative group">
+                            <button type="submit" className="px-3 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"><PlusIcon /></button>
+                            <div className="absolute bottom-full mb-1 right-1/2 translate-x-1/2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                {t('addPriority')}
+                            </div>
+                        </div>
                     </form>
                 </Section>
                 </div>
@@ -354,7 +349,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
               return (
                   <div className="space-y-8">
                       <Section title={t('kanbanColumns')}>
-                          <div className='space-y-2 max-h-80 overflow-y-auto pr-2'>
+                          <div className='space-y-2 max-h-96 overflow-y-auto pr-2'>
                               {kanbanColumns.map((column, index) => (
                                 <div 
                                     key={column}
@@ -380,14 +375,19 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                             <span onDoubleClick={() => handleStartEditing(column)} className="py-0.5">{t(column)}</span>
                                         )}
                                     </div>
-                                    <button 
-                                        onClick={() => setColumnPendingDeletion(column)}
-                                        className="p-1 rounded-full text-red-400 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                                        aria-label={`Delete ${column}`}
-                                        disabled={index === 0}
-                                    >
-                                        <TrashIcon />
-                                    </button>
+                                    <div className="relative group">
+                                      <button 
+                                          onClick={() => setColumnPendingDeletion(column)}
+                                          className="p-1 rounded-full text-red-400 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                          aria-label={`Delete ${column}`}
+                                          disabled={index === 0}
+                                      >
+                                          <TrashIcon />
+                                      </button>
+                                      <div className="absolute top-1/2 -translate-y-1/2 right-full mr-2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                          {index === 0 ? t('deleteFirstColumnError') : t('delete')}
+                                      </div>
+                                    </div>
                               </div>
                               ))}
                           </div>
@@ -399,13 +399,18 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                                   placeholder={t('columnNamePlaceholder') as string}
                                   className="flex-1 w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
                               />
-                              <button
-                                  type="submit"
-                                  className="px-3 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"
-                                  aria-label={t('addColumn')}
-                              >
-                                  <PlusIcon />
-                              </button>
+                              <div className="relative group">
+                                <button
+                                    type="submit"
+                                    className="px-3 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"
+                                    aria-label={t('addColumn')}
+                                >
+                                    <PlusIcon />
+                                </button>
+                                <div className="absolute bottom-full mb-1 right-1/2 translate-x-1/2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                    {t('addColumn')}
+                                </div>
+                              </div>
                           </form>
                       </Section>
                       <Section title={t('sprintSettings')}>
@@ -430,9 +435,12 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                               onChange={(e) => onChangeDefaultKanbanSort(e.target.value as SortKey)}
                               className="w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
                           >
-                              <option value="priority">{t('priority')}</option>
-                              <option value="title">{t('title')}</option>
-                              <option value="responsible">{t('responsible')}</option>
+                              <option value="priority">{t('sortByPriority')}</option>
+                              <option value="title">{t('sortByTitle')}</option>
+                              <option value="responsible">{t('sortByResponsible')}</option>
+                              <option value="startDate">{t('sortByStartDate')}</option>
+                              <option value="endDate">{t('sortByEndDate')}</option>
+                              <option value="createdAt">{t('sortByCreationDate')}</option>
                           </select>
                       </Section>
                   </div>
@@ -451,7 +459,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
         aria-labelledby="setup-title"
       >
         <div 
-          className="bg-[var(--color-surface-1)] text-[var(--color-text-primary)] rounded-lg shadow-2xl w-full max-w-3xl m-4 animate-modal-in flex flex-col max-h-[90vh]"
+          className="bg-[var(--color-surface-1)] text-[var(--color-text-primary)] rounded-lg shadow-2xl w-full max-w-4xl m-4 animate-modal-in flex flex-col max-h-[90vh]"
           onClick={e => e.stopPropagation()}
         >
           <header className="flex items-center justify-between p-4 border-b border-[var(--color-surface-2)] flex-shrink-0">
