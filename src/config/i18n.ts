@@ -53,6 +53,11 @@ const resources = {
       sprint: "Sprint",
       doing: "Doing",
       done: "Done",
+      // KanbanView.tsx
+      sort: "Sort",
+      sortByPriority: "Sort by Priority",
+      sortByTitle: "Sort by Title",
+      sortByResponsible: "Sort by Responsible",
     }
   },
   pt: {
@@ -105,6 +110,11 @@ const resources = {
       sprint: "Sprint",
       doing: "Em Andamento",
       done: "Feito",
+      // KanbanView.tsx
+      sort: "Ordenar",
+      sortByPriority: "Ordenar por Prioridade",
+      sortByTitle: "Ordenar por Título",
+      sortByResponsible: "Ordenar por Responsável",
     }
   }
 };

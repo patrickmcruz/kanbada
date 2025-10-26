@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TaskWorkPackage, TeamMember, Priority } from '../types';
 import { getPriorityClasses } from '../utils/styleUtils';
@@ -107,11 +107,30 @@ const priorityOrder: Record<Priority, number> = {
   'Baixa': 4,
 };
 
+type SortKey = 'priority' | 'title' | 'responsible';
+
+const MoreVerticalIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+);
+
 
 export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMembers, onTaskStatusChange }) => {
   const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [sortConfig, setSortConfig] = useState<Record<string, SortKey>>({});
+  const [openSortMenu, setOpenSortMenu] = useState<string | null>(null);
+  const sortMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+        if (sortMenuRef.current && !sortMenuRef.current.contains(event.target as Node)) {
+            setOpenSortMenu(null);
+        }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
     e.dataTransfer.setData('taskId', taskId);
@@ -143,6 +162,11 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
     setExpandedTaskId(currentId => (currentId === taskId ? null : taskId));
   };
 
+  const handleSortChange = (columnName: string, key: SortKey) => {
+    setSortConfig(prev => ({ ...prev, [columnName]: key }));
+    setOpenSortMenu(null);
+  };
+
 
   return (
     <div 
@@ -150,9 +174,22 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
         onDragEnd={handleDragEnd}
     >
       {columns.map(column => {
+        const sortKey = sortConfig[column];
+
         const tasksInColumn = tasks
             .filter(task => task.status === column)
             .sort((a, b) => {
+                if (sortKey === 'title') {
+                    return a.title.localeCompare(b.title);
+                }
+                if (sortKey === 'responsible') {
+                    const ownerA = teamMembers.find(m => m.id === a.ownerId);
+                    const ownerB = teamMembers.find(m => m.id === b.ownerId);
+                    const nameA = (ownerA && ownerA.id !== 'unassigned') ? ownerA.name.toLowerCase() : 'zzzz';
+                    const nameB = (ownerB && ownerB.id !== 'unassigned') ? ownerB.name.toLowerCase() : 'zzzz';
+                    return nameA.localeCompare(nameB);
+                }
+                // Default sort: priority
                 const priorityValueA = a.priority ? priorityOrder[a.priority] : Infinity;
                 const priorityValueB = b.priority ? priorityOrder[b.priority] : Infinity;
                 return priorityValueA - priorityValueB;
@@ -167,10 +204,36 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
             className="w-80 flex-shrink-0 bg-[var(--color-surface-2)] rounded-lg flex flex-col drop-cell transition-colors"
           >
             <div className="p-3 border-b-2 border-[var(--color-surface-1)] sticky top-0 bg-[var(--color-surface-2)] rounded-t-lg z-10">
-              <h3 className="font-bold text-sm uppercase tracking-wider text-[var(--color-text-primary)] flex justify-between items-center">
+              <div className="font-bold text-sm uppercase tracking-wider text-[var(--color-text-primary)] flex justify-between items-center">
                 <span>{t(column)}</span>
-                <span className="text-xs font-mono bg-[var(--color-surface-3)] text-[var(--color-text-secondary)] px-2 py-1 rounded-full">{tasksInColumn.length} / {totalHours}h</span>
-              </h3>
+                <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono bg-[var(--color-surface-3)] text-[var(--color-text-secondary)] px-2 py-1 rounded-full">{tasksInColumn.length} / {totalHours}h</span>
+                    <div className="relative">
+                        <button 
+                            onClick={() => setOpenSortMenu(openSortMenu === column ? null : column)}
+                            className="p-1 rounded-full hover:bg-[var(--color-surface-3)] text-[var(--color-text-secondary)]"
+                            aria-label={t('sort') as string}
+                            aria-haspopup="true"
+                            aria-expanded={openSortMenu === column}
+                        >
+                            <MoreVerticalIcon />
+                        </button>
+                        {openSortMenu === column && (
+                            <div ref={sortMenuRef} className="absolute right-0 mt-2 w-48 bg-[var(--color-surface-1)] border border-[var(--color-surface-3)] rounded-md shadow-lg z-20 py-1">
+                                <button onClick={() => handleSortChange(column, 'priority')} className="w-full text-left px-4 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]">
+                                    {t('sortByPriority')}
+                                </button>
+                                <button onClick={() => handleSortChange(column, 'title')} className="w-full text-left px-4 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]">
+                                    {t('sortByTitle')}
+                                </button>
+                                <button onClick={() => handleSortChange(column, 'responsible')} className="w-full text-left px-4 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)]">
+                                    {t('sortByResponsible')}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+              </div>
             </div>
             <div className="p-2 space-y-2 overflow-y-auto flex-1">
               {tasksInColumn.map(task => (
