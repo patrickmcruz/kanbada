@@ -7,7 +7,7 @@ import { SetupScreen } from './components/SetupScreen';
 import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { useWorkload } from './hooks/useWorkload';
 import { TEAM_MEMBERS } from './data/team';
-import type { ViewLevel, TaskWorkPackage, AppView, SortKey, ResponsibleSortOrder } from './types';
+import type { ViewLevel, TaskWorkPackage, AppView, SortKey, ResponsibleSortOrder, PriorityDefinition } from './types';
 
 interface SelectedWorkPackageInfo {
   task: TaskWorkPackage;
@@ -18,6 +18,13 @@ interface SelectedWorkPackageInfo {
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  const [priorities, setPriorities] = useState<PriorityDefinition[]>(() => [
+    { key: 'urgent', name: t('urgent'), color: '#a855f7' }, // purple-500
+    { key: 'high', name: t('high'), color: '#ef4444' }, // red-500
+    { key: 'medium', name: t('medium'), color: '#eab308' }, // yellow-500
+    { key: 'low', name: t('low'), color: '#3b82f6' }, // blue-500
+  ]);
 
   const {
     workPackages,
@@ -36,7 +43,7 @@ const App: React.FC = () => {
     handleTaskStatusChange,
     handleRenameColumnTasks,
     handleMoveTasks,
-  } = useWorkload(currentDate);
+  } = useWorkload(currentDate, priorities);
 
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
   const [activeView, setActiveView] = useState<AppView>('Workload');
@@ -155,6 +162,7 @@ const App: React.FC = () => {
         cardNameOptions={cardNameOptions}
         responsibleOptions={responsibleOptions}
         priorityOptions={priorityOptions}
+        priorities={priorities}
       />
       <main className="flex-1 overflow-auto p-4">
         {activeView === 'Workload' ? (
@@ -166,6 +174,7 @@ const App: React.FC = () => {
               onWorkPackageDoubleClick={handleWorkPackageDoubleClick}
               responsibleSortOrder={responsibleSortOrder}
               onResponsibleSortOrderChange={setResponsibleSortOrder}
+              priorities={priorities}
             />
         ) : (
             <KanbanView 
@@ -177,6 +186,7 @@ const App: React.FC = () => {
               onWorkPackageDoubleClick={handleWorkPackageDoubleClick}
               defaultSortKey={defaultKanbanSort}
               sprintDays={sprintDays}
+              priorities={priorities}
             />
         )}
       </main>
@@ -198,6 +208,8 @@ const App: React.FC = () => {
           onChangeSprintDays={setSprintDays}
           responsibleSortOrder={responsibleSortOrder}
           onChangeResponsibleSortOrder={setResponsibleSortOrder}
+          priorities={priorities}
+          onChangePriorities={setPriorities}
         />
       )}
       {selectedWorkPackageInfo && (
@@ -207,6 +219,7 @@ const App: React.FC = () => {
           projectTitle={selectedWorkPackageInfo.projectTitle}
           onClose={() => setSelectedWorkPackageInfo(null)}
           teamMembers={TEAM_MEMBERS}
+          priorities={priorities}
         />
       )}
     </div>

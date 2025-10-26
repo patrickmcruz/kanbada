@@ -1,22 +1,33 @@
-import type { Priority } from '../types';
+import type { Priority, PriorityDefinition } from '../types';
 
-interface PriorityClasses {
-  dot: string;
-  text: string;
-  border: string;
+interface PriorityStyles {
+  border: React.CSSProperties;
+  dot: React.CSSProperties;
+  text: React.CSSProperties;
 }
 
-export const getPriorityClasses = (priority?: Priority): PriorityClasses => {
-  switch (priority) {
-    case 'urgent':
-      return { dot: 'bg-purple-500', text: 'text-purple-400', border: 'border-purple-500' };
-    case 'high':
-      return { dot: 'bg-red-500', text: 'text-red-400', border: 'border-red-500' };
-    case 'medium':
-      return { dot: 'bg-yellow-500', text: 'text-yellow-400', border: 'border-yellow-500' };
-    case 'low':
-      return { dot: 'bg-blue-500', text: 'text-blue-400', border: 'border-blue-500' };
-    default:
-      return { dot: 'bg-gray-500', text: 'text-gray-400', border: 'border-[var(--color-main)]' };
+const defaultStyles: PriorityStyles = {
+  border: { borderColor: 'var(--color-main)' },
+  dot: { backgroundColor: 'var(--color-text-secondary)' },
+  text: { color: 'var(--color-text-secondary)' },
+};
+
+export const getPriorityStyles = (
+  priorityKey: Priority | undefined,
+  priorities: PriorityDefinition[]
+): PriorityStyles => {
+  if (!priorityKey) {
+    return defaultStyles;
   }
+
+  const priority = priorities.find(p => p.key === priorityKey);
+  if (!priority) {
+    return defaultStyles;
+  }
+  
+  return {
+    border: { borderColor: priority.color },
+    dot: { backgroundColor: priority.color },
+    text: { color: priority.color },
+  };
 };

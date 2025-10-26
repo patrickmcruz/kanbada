@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TaskWorkPackage, TeamMember, ViewLevel, ResponsibleSortOrder } from '../types';
+import type { TaskWorkPackage, TeamMember, ViewLevel, ResponsibleSortOrder, PriorityDefinition } from '../types';
 import { generateDateColumns, getStartOfDay } from '../utils/dateUtils';
 import { WorkPackageCard } from '../components/WorkPackageCard';
 
@@ -12,6 +12,7 @@ interface WorkloadViewProps {
   onWorkPackageDoubleClick: (workPackage: TaskWorkPackage) => void;
   responsibleSortOrder: ResponsibleSortOrder;
   onResponsibleSortOrderChange: (order: ResponsibleSortOrder) => void;
+  priorities: PriorityDefinition[];
 }
 
 // --- Icons ---
@@ -37,7 +38,7 @@ const getColorForId = (id: string) => {
 const getInitials = (name: string) => name.charAt(0).toUpperCase();
 // --- End of helper functions ---
 
-export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageDoubleClick, responsibleSortOrder, onResponsibleSortOrderChange }) => {
+export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDate, workPackages, teamMembers, onWorkPackageDoubleClick, responsibleSortOrder, onResponsibleSortOrderChange, priorities }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
   const dateColumns = generateDateColumns(viewLevel, currentDate, locale);
@@ -298,6 +299,7 @@ export const WorkloadView: React.FC<WorkloadViewProps> = ({ viewLevel, currentDa
                                             workPackage={workPackage} 
                                             maxStack={layoutInfo?.maxStack ?? 1}
                                             onDoubleClick={onWorkPackageDoubleClick} 
+                                            priorities={priorities}
                                         />
                                     </div>
                                 );

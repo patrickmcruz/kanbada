@@ -1,8 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Priority, ViewLevel, AppView } from '../types';
+import type { PriorityDefinition, ViewLevel, AppView } from '../types';
 import { addDays, addMonths, addYears, getFormattedDateRange } from '../utils/dateUtils';
-import { getPriorityClasses } from '../utils/styleUtils';
 import { FilterCombobox } from './FilterCombobox';
 
 interface ToolbarProps {
@@ -20,6 +19,7 @@ interface ToolbarProps {
   responsibleOptions: string[];
   priorityOptions: string[];
   activeView: AppView;
+  priorities: PriorityDefinition[];
 }
 
 const ChevronLeftIcon = () => (
@@ -45,6 +45,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     responsibleOptions,
     priorityOptions,
     activeView,
+    priorities,
 }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
@@ -74,12 +75,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   };
 
   const renderPriorityOption = (option: string) => {
-    const priority = option as Priority;
-    const { dot } = getPriorityClasses(priority);
+    const priority = priorities.find(p => p.key === option);
+    if (!priority) {
+      return <span>{option}</span>;
+    }
     return (
         <div className="flex items-center gap-2">
-            <span className={`w-3 h-3 rounded-full ${dot}`}></span>
-            <span>{t(`priority_${priority}`)}</span>
+            <span className={`w-3 h-3 rounded-full`} style={{ backgroundColor: priority.color }}></span>
+            <span>{priority.name}</span>
         </div>
     );
   };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SortKey, TaskWorkPackage, ResponsibleSortOrder } from '../types';
+import type { SortKey, TaskWorkPackage, ResponsibleSortOrder, PriorityDefinition } from '../types';
 
 interface SetupScreenProps {
   onClose: () => void;
@@ -19,6 +19,8 @@ interface SetupScreenProps {
   onChangeSprintDays: (days: number) => void;
   responsibleSortOrder: ResponsibleSortOrder;
   onChangeResponsibleSortOrder: (order: ResponsibleSortOrder) => void;
+  priorities: PriorityDefinition[];
+  onChangePriorities: (priorities: PriorityDefinition[]) => void;
 }
 
 type SetupTab = 'general' | 'workload' | 'kanban';
@@ -81,7 +83,7 @@ const ConfirmationDialog: React.FC<{ title: string; message: string; onConfirm: 
 };
 
 
-export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, onRenameKanbanColumn, allTasks, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays, responsibleSortOrder, onChangeResponsibleSortOrder }) => {
+export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, onRenameKanbanColumn, allTasks, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays, responsibleSortOrder, onChangeResponsibleSortOrder, priorities, onChangePriorities }) => {
   const { t } = useTranslation();
   const [newColumnName, setNewColumnName] = useState('');
   const [activeTab, setActiveTab] = useState<SetupTab>('general');
@@ -90,6 +92,11 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
   const [editingValue, setEditingValue] = useState('');
   const [columnPendingDeletion, setColumnPendingDeletion] = useState<string | null>(null);
   const dragTargetRef = React.useRef<HTMLDivElement | null>(null);
+  // State for priorities
+  const [draggedPriorityIndex, setDraggedPriorityIndex] = useState<number | null>(null);
+  const [editingPriorityKey, setEditingPriorityKey] = useState<string | null>(null);
+  const [newPriorityName, setNewPriorityName] = useState('');
+  const [newPriorityColor, setNewPriorityColor] = useState('#808080');
 
   const handleAddColumn = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,10 +165,61 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
     }
   };
 
+  // --- Priority Handlers ---
+    const isPriorityInUse = (key: string) => allTasks.some(task => task.priority === key);
+
+    const handleAddPriority = (e: React.FormEvent) => {
+        e.preventDefault();
+        const trimmedName = newPriorityName.trim();
+        if (!trimmedName) return;
+
+        const newKey = trimmedName.toLowerCase().replace(/\s+/g, '-');
+        if (priorities.some(p => p.key === newKey || p.name.toLowerCase() === trimmedName.toLowerCase())) {
+            alert('A priority with this name or key already exists.');
+            return;
+        }
+
+        onChangePriorities([...priorities, { key: newKey, name: trimmedName, color: newPriorityColor }]);
+        setNewPriorityName('');
+        setNewPriorityColor('#808080');
+    };
+
+    const handleUpdatePriority = (key: string, updates: Partial<PriorityDefinition>) => {
+        onChangePriorities(priorities.map(p => p.key === key ? { ...p, ...updates } : p));
+    };
+
+    const handleDeletePriority = (key: string) => {
+        if (isPriorityInUse(key)) {
+            alert(t('deletePriorityError'));
+            return;
+        }
+        onChangePriorities(priorities.filter(p => p.key !== key));
+    };
+    
+    const handlePriorityDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+        setDraggedPriorityIndex(index);
+    };
+
+    const handlePriorityDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+        e.preventDefault();
+        if (draggedPriorityIndex === null || draggedPriorityIndex === index) return;
+        
+        const newPriorities = [...priorities];
+        const [draggedItem] = newPriorities.splice(draggedPriorityIndex, 1);
+        newPriorities.splice(index, 0, draggedItem);
+        onChangePriorities(newPriorities);
+        setDraggedPriorityIndex(index);
+    };
+    
+    const handlePriorityDragEnd = () => {
+        setDraggedPriorityIndex(null);
+    };
+
   const renderContent = () => {
       switch(activeTab) {
           case 'general':
               return (
+                <div className="space-y-8">
                 <Section title={t('appearance')}>
                   <fieldset>
                     <legend className="text-md font-medium text-[var(--color-text-primary)] mb-3">{t('theme')}</legend>
@@ -203,6 +261,70 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
                     </div>
                   </fieldset>
                 </Section>
+                <Section title={t('priorities')}>
+                    <div className='space-y-2 max-h-48 overflow-y-auto pr-2'>
+                        {priorities.map((p, index) => (
+                            <div
+                                key={p.key}
+                                draggable
+                                onDragStart={(e) => handlePriorityDragStart(e, index)}
+                                onDragOver={(e) => handlePriorityDragOver(e, index)}
+                                onDragEnd={handlePriorityDragEnd}
+                                className={`flex items-center gap-2 p-2 rounded-md transition-opacity bg-[var(--color-surface-2)] ${draggedPriorityIndex === index ? 'opacity-30' : ''}`}
+                            >
+                                <div className="cursor-grab active:cursor-grabbing"><GripVerticalIcon /></div>
+                                <span className="text-sm font-semibold text-[var(--color-text-secondary)] w-6 text-center">{index + 1}</span>
+                                <input
+                                    type="color"
+                                    value={p.color}
+                                    onChange={(e) => handleUpdatePriority(p.key, { color: e.target.value })}
+                                    className="w-8 h-8 rounded-md bg-transparent border-none cursor-pointer"
+                                />
+                                <input
+                                    type="text"
+                                    value={editingPriorityKey === p.key ? editingValue : p.name}
+                                    onFocus={() => { setEditingPriorityKey(p.key); setEditingValue(p.name); }}
+                                    onChange={(e) => setEditingValue(e.target.value)}
+                                    onBlur={() => { handleUpdatePriority(p.key, { name: editingValue.trim() }); setEditingPriorityKey(null); }}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); if (e.key === 'Escape') setEditingPriorityKey(null); }}
+                                    className="flex-1 w-full rounded-md border border-transparent hover:border-[var(--color-surface-3)] bg-[var(--color-surface-2)] focus:bg-[var(--color-back)] focus:border-[var(--color-main)] py-1.5 px-2 text-sm text-[var(--color-text-primary)] focus:outline-none"
+                                />
+                                <div className="relative group">
+                                    <button
+                                        onClick={() => handleDeletePriority(p.key)}
+                                        disabled={isPriorityInUse(p.key)}
+                                        className="p-1 rounded-full text-red-400 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                        aria-label={`Delete ${p.name}`}
+                                    >
+                                        <TrashIcon />
+                                    </button>
+                                    {isPriorityInUse(p.key) && (
+                                        <div className="absolute top-1/2 -translate-y-1/2 right-full mr-2 w-max px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                            {t('deletePriorityError')}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <form onSubmit={handleAddPriority} className="flex gap-2 mt-4">
+                        <input
+                            type="text"
+                            value={newPriorityName}
+                            onChange={e => setNewPriorityName(e.target.value)}
+                            placeholder={t('priorityName') as string}
+                            className="flex-1 w-full rounded-md border border-[var(--color-surface-3)] bg-[var(--color-back)] py-2 px-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-main)]"
+                        />
+                        <input
+                            type="color"
+                            value={newPriorityColor}
+                            onChange={e => setNewPriorityColor(e.target.value)}
+                            className="h-auto w-12 rounded-md bg-transparent border border-[var(--color-surface-3)] cursor-pointer"
+                        />
+                        <button type="submit" className="px-3 py-2 text-sm font-semibold rounded-md transition-colors bg-[var(--color-main)] text-white hover:brightness-110 flex items-center"><PlusIcon /></button>
+                    </form>
+                </Section>
+                </div>
               );
           case 'workload':
               return (

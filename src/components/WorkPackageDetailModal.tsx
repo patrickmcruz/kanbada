@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TaskWorkPackage, TeamMember } from '../types';
+import type { TaskWorkPackage, TeamMember, PriorityDefinition } from '../types';
 import { daysBetween } from '../utils/dateUtils';
-import { getPriorityClasses } from '../utils/styleUtils';
+import { getPriorityStyles } from '../utils/styleUtils';
 
 interface WorkPackageDetailModalProps {
   workPackage: TaskWorkPackage;
@@ -10,6 +10,7 @@ interface WorkPackageDetailModalProps {
   projectTitle: string;
   onClose: () => void;
   teamMembers: TeamMember[];
+  priorities: PriorityDefinition[];
 }
 
 const XIcon = () => (
@@ -23,7 +24,7 @@ const DetailRow: React.FC<{ label: string; value: string | React.ReactNode }> = 
     </div>
 );
 
-export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ workPackage, phaseTitle, projectTitle, onClose, teamMembers }) => {
+export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ workPackage, phaseTitle, projectTitle, onClose, teamMembers, priorities }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
 
@@ -35,7 +36,8 @@ export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ 
   };
 
   const duration = daysBetween(workPackage.startDate, workPackage.endDate);
-  const priorityClasses = getPriorityClasses(workPackage.priority);
+  const priorityStyles = getPriorityStyles(workPackage.priority, priorities);
+  const priorityInfo = priorities.find(p => p.key === workPackage.priority);
 
   return (
     <div 
@@ -72,13 +74,13 @@ export const WorkPackageDetailModal: React.FC<WorkPackageDetailModalProps> = ({ 
             <dl className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                 <DetailRow label={t('responsible')} value={responsibleName} />
                 
-                {workPackage.priority && (
+                {priorityInfo && (
                     <DetailRow 
                         label={t('priority')} 
                         value={
                             <div className="flex items-center gap-2">
-                                <span className={`w-3 h-3 rounded-full ${priorityClasses.dot}`}></span>
-                                <span className={`font-medium ${priorityClasses.text}`}>{t(`priority_${workPackage.priority}`)}</span>
+                                <span className="w-3 h-3 rounded-full" style={priorityStyles.dot}></span>
+                                <span className="font-medium" style={priorityStyles.text}>{priorityInfo.name}</span>
                             </div>
                         } 
                     />

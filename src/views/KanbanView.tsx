@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TaskWorkPackage, TeamMember, Priority, SortKey } from '../types';
-import { getPriorityClasses } from '../utils/styleUtils';
+import type { TaskWorkPackage, TeamMember, SortKey, PriorityDefinition } from '../types';
+import { getPriorityStyles } from '../utils/styleUtils';
 
 
 interface KanbanViewProps {
@@ -13,6 +13,7 @@ interface KanbanViewProps {
   onColumnsChange: (columns: string[]) => void;
   onWorkPackageDoubleClick: (workPackage: TaskWorkPackage) => void;
   sprintDays: number;
+  priorities: PriorityDefinition[];
 }
 
 // --- Avatar helper functions ---
@@ -33,14 +34,15 @@ const getColorForId = (id: string) => {
 const getInitials = (name: string) => name.charAt(0).toUpperCase();
 // --- End of avatar functions ---
 
-const CompactTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId: string) => void; teamMembers: TeamMember[] }> = ({ task, onDoubleClick, teamMembers }) => {
+const CompactTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId: string) => void; teamMembers: TeamMember[]; priorities: PriorityDefinition[] }> = ({ task, onDoubleClick, teamMembers, priorities }) => {
     const owner = teamMembers.find(m => m.id === task.ownerId);
-    const { border: borderColor } = getPriorityClasses(task.priority);
+    const { border: borderStyle } = getPriorityStyles(task.priority, priorities);
 
     return (
         <div
             onDoubleClick={() => onDoubleClick(task.id)}
-            className={`w-full bg-[var(--color-surface-1)] rounded-md flex items-center justify-between p-2 cursor-pointer hover:bg-[var(--color-surface-3)] border-l-4 ${borderColor} transition-all`}
+            style={borderStyle}
+            className={`w-full bg-[var(--color-surface-1)] rounded-md flex items-center justify-between p-2 cursor-pointer hover:bg-[var(--color-surface-3)] border-l-4 transition-all`}
         >
             <p className="font-semibold text-xs text-[var(--color-text-primary)] truncate flex-1 pr-2">
                 {task.projectId && `[${task.projectId}] `}{task.title}
@@ -57,16 +59,18 @@ const CompactTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId:
     );
 };
 
-const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId: string) => void; teamMembers: TeamMember[] }> = ({ task, onDoubleClick, teamMembers }) => {
-    const { t, i18n } = useTranslation();
+const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId: string) => void; teamMembers: TeamMember[]; priorities: PriorityDefinition[] }> = ({ task, onDoubleClick, teamMembers, priorities }) => {
+    const { i18n } = useTranslation();
     const locale = i18n.language.startsWith('pt') ? 'pt-BR' : 'en-US';
     const owner = teamMembers.find(m => m.id === task.ownerId);
-    const { border: borderColor, dot: dotColor, text: textColor } = getPriorityClasses(task.priority);
+    const priority = priorities.find(p => p.key === task.priority);
+    const { border: borderStyle } = getPriorityStyles(task.priority, priorities);
 
     return (
         <div
             onDoubleClick={() => onDoubleClick(task.id)}
-            className={`w-full bg-[var(--color-surface-1)] rounded-lg p-3 cursor-pointer border-l-4 ${borderColor} ring-2 ring-[var(--color-main)] shadow-lg`}
+            style={borderStyle}
+            className={`w-full bg-[var(--color-surface-1)] rounded-lg p-3 cursor-pointer border-l-4 ring-2 ring-[var(--color-main)] shadow-lg`}
         >
             <p className="font-bold text-sm text-[var(--color-text-primary)] mb-2">
                 {task.projectId && `[${task.projectId}] `}{task.title}
@@ -82,10 +86,10 @@ const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId
                     </div>
                 )}
                 
-                {task.priority && (
+                {priority && (
                      <div className="flex items-center gap-2">
-                        <span className={`w-2.5 h-2.5 rounded-full ${dotColor}`}></span>
-                        <span className={`font-medium ${textColor}`}>{t(`priority_${task.priority}`)}</span>
+                        <span className={`w-2.5 h-2.5 rounded-full`} style={{ backgroundColor: priority.color }}></span>
+                        <span className={`font-medium`} style={{ color: priority.color }}>{priority.name}</span>
                     </div>
                 )}
 
@@ -103,19 +107,12 @@ const ExpandedTaskCard: React.FC<{ task: TaskWorkPackage; onDoubleClick: (taskId
     );
 };
 
-const priorityOrder: Record<Priority, number> = {
-  'urgent': 1,
-  'high': 2,
-  'medium': 3,
-  'low': 4,
-};
-
 const MoreVerticalIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 );
 
 
-export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMembers, onTaskStatusChange, onColumnsChange, defaultSortKey, onWorkPackageDoubleClick, sprintDays }) => {
+export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMembers, onTaskStatusChange, onColumnsChange, defaultSortKey, onWorkPackageDoubleClick, sprintDays, priorities }) => {
   const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
@@ -206,8 +203,12 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
                     return nameA.localeCompare(nameB);
                 }
                 // Default sort: priority
-                const priorityValueA = a.priority ? priorityOrder[a.priority] : Infinity;
-                const priorityValueB = b.priority ? priorityOrder[b.priority] : Infinity;
+                const priorityIndexA = a.priority ? priorities.findIndex(p => p.key === a.priority) : -1;
+                const priorityIndexB = b.priority ? priorities.findIndex(p => p.key === b.priority) : -1;
+                
+                const priorityValueA = priorityIndexA === -1 ? Infinity : priorityIndexA;
+                const priorityValueB = priorityIndexB === -1 ? Infinity : priorityIndexB;
+
                 return priorityValueA - priorityValueB;
             });
         const totalHours = tasksInColumn.reduce((sum, task) => sum + task.hours, 0);
@@ -275,12 +276,14 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ columns, tasks, teamMemb
                       task={task}
                       onDoubleClick={handleCardDoubleClick}
                       teamMembers={teamMembers}
+                      priorities={priorities}
                     />
                   ) : (
                     <CompactTaskCard 
                       task={task} 
                       onDoubleClick={handleCardDoubleClick} 
                       teamMembers={teamMembers} 
+                      priorities={priorities}
                     />
                   )}
                 </div>

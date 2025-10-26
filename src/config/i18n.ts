@@ -48,6 +48,11 @@ const resources = {
       defaultResponsibleSort: "Default Responsible Column Sort",
       az: "A-Z",
       za: "Z-A",
+      priorities: "Priorities",
+      addPriority: "Add Priority",
+      priorityName: "Priority Name",
+      priorityColor: "Color",
+      deletePriorityError: "This priority is in use and cannot be deleted.",
       // TaskDetailModal.tsx
       taskDetails: "Work Package Details",
       project: "Project",
@@ -56,7 +61,6 @@ const resources = {
       startDate: "Start Date",
       endDate: "End Date",
       duration: "Duration",
-      // FIX: Renamed 'day' to 'day_singular' to avoid duplicate key error.
       day_singular: "day",
       days: "days",
       hours: "Hours",
@@ -74,11 +78,11 @@ const resources = {
       sortByPriority: "Sort by Priority",
       sortByTitle: "Sort by Title",
       sortByResponsible: "Sort by Responsible",
-      // Priorities
-      priority_urgent: "Urgent",
-      priority_high: "High",
-      priority_medium: "Medium",
-      priority_low: "Low",
+      // Default priority names
+      urgent: "Urgent",
+      high: "High",
+      medium: "Medium",
+      low: "Low",
     }
   },
   pt: {
@@ -126,6 +130,11 @@ const resources = {
       defaultResponsibleSort: "Ordenação Padrão da Coluna Responsável",
       az: "A-Z",
       za: "Z-A",
+      priorities: "Prioridades",
+      addPriority: "Adicionar Prioridade",
+      priorityName: "Nome da Prioridade",
+      priorityColor: "Cor",
+      deletePriorityError: "Esta prioridade está em uso e não pode ser excluída.",
       // TaskDetailModal.tsx
       taskDetails: "Detalhes do Pacote de Trabalho",
       project: "Projeto",
@@ -134,7 +143,6 @@ const resources = {
       startDate: "Data de Início",
       endDate: "Data de Fim",
       duration: "Duração",
-      // FIX: Renamed 'day' to 'day_singular' to avoid duplicate key error.
       day_singular: "dia",
       days: "dias",
       hours: "Horas",
@@ -152,11 +160,11 @@ const resources = {
       sortByPriority: "Ordenar por Prioridade",
       sortByTitle: "Ordenar por Título",
       sortByResponsible: "Ordenar por Responsável",
-      // Priorities
-      priority_urgent: "Urgente",
-      priority_high: "Alta",
-      priority_medium: "Média",
-      priority_low: "Baixa",
+      // Default priority names
+      urgent: "Urgente",
+      high: "Alta",
+      medium: "Média",
+      low: "Baixa",
     }
   }
 };

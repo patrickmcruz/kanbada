@@ -2,9 +2,9 @@ import { useState, useMemo } from 'react';
 import { WORK_PACKAGES as initialWorkPackages } from '../data/work-packages';
 import { TEAM_MEMBERS } from '../data/team';
 import { getStartOfWeek, addDays, getStartOfDay } from '../utils/dateUtils';
-import type { TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage, Priority } from '../types';
+import type { TaskWorkPackage, ProjectWorkPackage, DemandWorkPackage, PriorityDefinition } from '../types';
 
-export const useWorkload = (currentDate: Date) => {
+export const useWorkload = (currentDate: Date, priorities: PriorityDefinition[]) => {
     const [workPackages, setWorkPackages] = useState<(ProjectWorkPackage | DemandWorkPackage)[]>(initialWorkPackages);
     const [filterCardName, setFilterCardName] = useState<string[]>([]);
     const [filterResponsible, setFilterResponsible] = useState<string[]>([]);
@@ -42,7 +42,7 @@ export const useWorkload = (currentDate: Date) => {
         return Array.from(responsibles).sort();
     }, [allTasks]);
 
-    const priorityOptions = useMemo((): Priority[] => ['urgent', 'high', 'medium', 'low'], []);
+    const priorityOptions = useMemo((): string[] => priorities.map(p => p.key), [priorities]);
 
     const handleTaskStatusChange = (taskId: string, newStatus: string) => {
         const updatedWorkPackages = workPackages.map(container => {

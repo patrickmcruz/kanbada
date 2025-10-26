@@ -1,5 +1,6 @@
 
 
+
 export type ViewLevel = 'Day' | 'Week' | 'Month';
 export type AppView = 'Workload' | 'Kanban';
 export type SortKey = 'priority' | 'title' | 'responsible';
@@ -10,8 +11,14 @@ export interface TeamMember {
   name: string;
 }
 
-// Explicit priority type
-export type Priority = 'urgent' | 'high' | 'medium' | 'low';
+// Represents the priority key
+export type Priority = string;
+
+export interface PriorityDefinition {
+  key: string;
+  name: string;
+  color: string;
+}
 
 // Base interface for all work packages
 interface WorkPackageBase {
