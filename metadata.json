@@ -1,5 +1,5 @@
 {
-  "name": "Workload View",
+  "name": "Kanbada",
   "description": "A modern workload view to visualize team activities. It allows users to view tasks by day, week, or month with drill-down and drill-up navigation.",
   "requestFramePermissions": []
 }
