@@ -26,6 +26,8 @@ Sugestões Aprimoradas (Priorizadas):
   Decisão: O que foi decidido.
   Consequências: Quais os prós e contras dessa decisão.
 
+  Referência de estudo:  Architecture Decision Records (ADR): https://blog.muratdinc.dev/what-are-architecture-decision-records-adr-and-what-should-you-consider-when-making-architectural-3e8298502c30
+
 3. Diagrama de Contexto de Sistema (C4 Model - Nível 1)
   O que é? Um diagrama extremamente simples que mostra o seu sistema como uma "caixa preta" no centro, os usuários que interagem com ele e quaisquer sistemas externos com os quais ele se comunica.
   
@@ -82,6 +84,7 @@ Curto Prazo (Fundação da Arquitetura):
   Crie seus primeiros ADRs para as decisões já tomadas (React, Tailwind).
   Desenhe o Diagrama de Contexto (C4 Nível 1).
   Comece a montar o Guia de Estilo de Código.
+  Crie os ADR's.
 
 Médio Prazo (Escalando a Produtividade):
   Configure o Storybook para os componentes mais reutilizáveis (botões, modais, cartões).
