@@ -8,26 +8,30 @@
 
 Uma visão de carga de trabalho moderna para visualizar as atividades da equipe. Permite que os usuários visualizem tarefas por dia, semana ou mês com navegação detalhada (drill-down e drill-up).
 
-## Tabela de Conteúdos
+## 📑 Tabela de Conteúdos
 
-1.  [Visão Geral](#visão-geral)
-2.  [Principais Funcionalidades](#principais-funcionalidades)
-3.  [Stack de Tecnologia](#stack-de-tecnologia)
-4.  [Estrutura do Projeto](#estrutura-do-projeto)
-5.  [Começando](#começando)
-    *   [Pré-requisitos](#pré-requisitos)
-    *   [Instalação e Execução](#instalação-e-execução)
-6.  [Configuração e Customização](#configuração-e-customização)
-    *   [Temas](#temas)
-    *   [Idiomas](#idiomas)
-    *   [Colunas do Kanban](#colunas-do-kanban)
-    *   [Prioridades](#prioridades)
-7.  [Conceitos Principais](#conceitos-principais)
-    *   [Modelo de Dados](#modelo-de-dados)
-    *   [Gerenciamento de Estado](#gerenciamento-de-estado)
-8.  [Contribuindo](#contribuindo)
+1.  [📌 Visão Geral](#visão-geral)
+2.  [✨ Principais Funcionalidades](#principais-funcionalidades)
+3.  [🧰 Stack de Tecnologia](#stack-de-tecnologia)
+4.  [🗂️ Estrutura do Projeto](#estrutura-do-projeto)
+5.  [🚀 Começando](#começando)
+    * [Pré-requisitos](#pré-requisitos)
+    * [Instalação e Execução](#instalação-e-execução)
+6.  [⚙️ Configuração e Customização](#configuração-e-customização)
+    * [Temas](#temas)
+    * [Idiomas](#idiomas)
+    * [Colunas do Kanban](#colunas-do-kanban)
+    * [Prioridades](#prioridades)
+7.  [🧠 Conceitos Principais](#conceitos-principais)
+    * [Modelo de Dados](#modelo-de-dados)
+    * [Gerenciamento de Estado](#gerenciamento-de-estado)
+8.  [🤝 Contribuindo](#contribuindo)
+9.  [🔨 Créditos](#créditos)
+10. [📞 Suporte](#suporte)
+11. [📄 Licença](#licença)
 
-## Visão Geral
+
+## 📌 Visão Geral
 
 A aplicação **Workload View** oferece uma interface rica e interativa para gerenciar e visualizar a carga de trabalho de uma equipe. Ela é projetada para fornecer clareza sobre as tarefas alocadas, prazos e responsabilidades, ajudando na tomada de decisões e no planejamento de projetos.
 
@@ -35,7 +39,7 @@ A aplicação possui duas visualizações principais:
 *   **Workload View**: Uma visualização de cronograma (timeline/Gantt) que exibe as tarefas distribuídas ao longo do tempo (dias, semanas ou meses) para cada membro da equipe.
 *   **Kanban View**: Um quadro Kanban tradicional que mostra as tarefas dentro de um sprint semanal, organizadas por status (ex: A Fazer, Em Andamento, Concluído).
 
-## Principais Funcionalidades
+## ✨ Principais Funcionalidades
 
 - **Visualizações Duplas**: Alterne facilmente entre a visão de Workload e Kanban.
 - **Navegação Temporal**: Navegue para frente e para trás no tempo e alterne entre as visualizações de Dia, Semana e Mês.
@@ -46,14 +50,14 @@ A aplicação possui duas visualizações principais:
 - **Internacionalização (i18n)**: Suporte para múltiplos idiomas (Inglês e Português por padrão).
 - **Design Responsivo**: Interface funcional em diferentes tamanhos de tela.
 
-## Stack de Tecnologia
+## 🧰 Stack de Tecnologia
 
 *   **React 19**: Biblioteca principal para a construção da interface de usuário.
 *   **TypeScript**: Para tipagem estática, melhorando a robustez e a manutenibilidade do código.
 *   **Tailwind CSS**: Framework CSS utility-first para estilização rápida e consistente.
 *   **i18next & react-i18next**: Para a gestão da internacionalização e traduções.
 
-## Estrutura do Projeto
+## 🗂️ Estrutura do Projeto
 
 O código-fonte está organizado da seguinte forma para garantir escalabilidade e clareza:
 
@@ -70,7 +74,7 @@ O código-fonte está organizado da seguinte forma para garantir escalabilidade 
 └── main.tsx         # Ponto de entrada da aplicação React
 ```
 
-## Começando
+## 🚀 Começando
 
 Siga estas instruções para obter uma cópia do projeto e executá-lo em sua máquina local para desenvolvimento e testes.
 
@@ -102,7 +106,7 @@ Siga estas instruções para obter uma cópia do projeto e executá-lo em sua m�
     ```
     A aplicação estará disponível em `http://localhost:5173` (ou outra porta disponível).
 
-## Configuração e Customização
+## ⚙️ Configuração e Customização
 
 A maioria das configurações pode ser acessada clicando no ícone de engrenagem no canto superior direito da aplicação.
 
@@ -126,7 +130,7 @@ Na aba "Geral", você pode gerenciar as prioridades:
 - **Reordenar** a ordem de importância das prioridades arrastando-as.
 - **Excluir** prioridades que não estão em uso.
 
-## Conceitos Principais
+## 🧠 Conceitos Principais
 
 ### Modelo de Dados
 A estrutura de dados principal está definida em `src/types/index.ts`. A entidade fundamental é o `TaskWorkPackage`, que representa uma tarefa agendável. As tarefas são agrupadas dentro de `PhaseWorkPackage` (para Projetos) ou diretamente em `DemandWorkPackage`.
@@ -138,7 +142,26 @@ A lógica de negócio e o estado principal da aplicação são centralizados no 
 - Processar atualizações de estado (ex: mudança de status de uma tarefa).
 - Fornecer os dados computados (tarefas filtradas, opções de filtro) para os componentes da UI.
 
-## Contribuindo
+## 🔨 Créditos
+
+**Criado por:** [Patrick Motin Cruz](https://github.com/patrickcruzutfpr)
+**Pós-graduado:** Estudante de Ciência de Dados na Universidade Tecnológica Federal do Paraná (UTFPR).
+**Desenvolvedor de Software de Aprendizado de Máquina** na Prefeitura Municipal de Curitiba. Tempo integral.
+
+## 📞 Suporte
+
+Para suporte e dúvidas:
+- Crie uma issue no [GitHub Issues](https://github.com/patrickcruzutfpr/family-budget-app/issues)
+- Consulte a documentação existente na pasta `/docs`
+- Revise a seção de solução de problemas acima
+
+## 📄 Licença
+
+Este projeto está licenciado sob a **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+Você tem permissão para usar, modificar e distribuir este software sob os termos da licença AGPL-3.0. Se você executar uma versão modificada deste software em um servidor e permitir que usuários interajam com ele por meio de uma rede, você deverá disponibilizar o código-fonte da sua versão modificada para esses usuários.
+Para mais detalhes, consulte o arquivo [LICENSE](LICENSE) ou visite [GNU AGPL v3.0](https://www.gnu.org/licenses/agpl-3.0.html).
+
+## 🤝 Contribuindo
 
 Contribuições são o que tornam a comunidade de código aberto um lugar incrível para aprender, inspirar e criar. Qualquer contribuição que você fizer será **muito apreciada**.
 
@@ -149,3 +172,5 @@ Contribuições são o que tornam a comunidade de código aberto um lugar incrí
 5.  Abra um Pull Request
 
 ---
+
+© 2025 Patrick Motin Cruz. All rights reserved under AGPL-3.0.
