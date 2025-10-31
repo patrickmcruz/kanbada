@@ -175,3 +175,4 @@ Contribuições são o que tornam a comunidade de código aberto um lugar incrí
 
 © 2025 Patrick Motin Cruz. All rights reserved under AGPL-3.0.
 
+
