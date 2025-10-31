@@ -271,6 +271,9 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, settings, onS
                                     onDragOver={(e) => { e.preventDefault(); dragOverItem.current = index; }}
                                 >
                                     <span className="cursor-grab"><GripVerticalIcon /></span>
+                                    <span className="w-6 h-6 flex-shrink-0 rounded-full bg-[var(--color-surface-1)] flex items-center justify-center text-xs font-bold text-[var(--color-text-secondary)]">
+                                        {index + 1}
+                                    </span>
                                     <input
                                         type="color"
                                         value={priority.color}

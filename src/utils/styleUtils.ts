@@ -1,9 +1,11 @@
+// Fix: Import CSSProperties from React to use for type definitions.
+import type { CSSProperties } from 'react';
 import type { Priority, PriorityDefinition } from '../types';
 
 interface PriorityStyles {
-  border: React.CSSProperties;
-  dot: React.CSSProperties;
-  text: React.CSSProperties;
+  border: CSSProperties;
+  dot: CSSProperties;
+  text: CSSProperties;
 }
 
 const defaultStyles: PriorityStyles = {
