@@ -30,6 +30,7 @@ Uma visão de carga de trabalho moderna para visualizar as atividades da equipe.
 10. [📞 Suporte](#suporte)
 11. [📄 Licença](#licença)
 
+---
 
 ## 📌 Visão Geral
 
@@ -61,7 +62,7 @@ A aplicação possui duas visualizações principais:
 
 O código-fonte está organizado da seguinte forma para garantir escalabilidade e clareza:
 
-```
+```text
 /src
 ├── components/      # Componentes React reutilizáveis (Toolbar, Modal, etc.)
 ├── config/          # Configurações da aplicação (i18n)
@@ -111,7 +112,7 @@ Siga estas instruções para obter uma cópia do projeto e executá-lo em sua m�
 A maioria das configurações pode ser acessada clicando no ícone de engrenagem no canto superior direito da aplicação.
 
 ### Temas
-Alterne entre os temas **Dark** (padrão) e **Light** na aba "Geral" das configurações.
+Altere entre os temas **Dark** (padrão) e **Light** na aba "Geral" das configurações.
 
 ### Idiomas
 Mude o idioma entre **Inglês (EN)** e **Português (PT)** na aba "Geral". Para adicionar um novo idioma, edite o arquivo `src/config/i18n.ts`, adicionando um novo recurso de tradução.
@@ -144,9 +145,9 @@ A lógica de negócio e o estado principal da aplicação são centralizados no 
 
 ## 🔨 Créditos
 
-**Criado por:** [Patrick Motin Cruz](https://github.com/patrickcruzutfpr)
-**Pós-graduado:** Estudante de Ciência de Dados na Universidade Tecnológica Federal do Paraná (UTFPR).
-**Desenvolvedor de Software de Aprendizado de Máquina** na Prefeitura Municipal de Curitiba. Tempo integral.
+ **Criado por:** [Patrick Motin Cruz](https://github.com/patrickcruzutfpr)
+ **Pós-graduado:** Estudante de Ciência de Dados na Universidade Tecnológica Federal do Paraná (UTFPR).
+ **Desenvolvedor de Software de Aprendizado de Máquina** na Prefeitura Municipal de Curitiba. Tempo integral.
 
 ## 📞 Suporte
 
@@ -174,5 +175,3 @@ Contribuições são o que tornam a comunidade de código aberto um lugar incrí
 ---
 
 © 2025 Patrick Motin Cruz. All rights reserved under AGPL-3.0.
-
-
