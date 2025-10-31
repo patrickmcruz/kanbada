@@ -2,6 +2,7 @@ export type ViewLevel = 'Day' | 'Week' | 'Month';
 export type AppView = 'Workload' | 'Kanban';
 export type SortKey = 'priority' | 'title' | 'responsible' | 'startDate' | 'endDate' | 'createdAt';
 export type ResponsibleSortOrder = 'asc' | 'desc';
+export type TeamPreset = 'analysts' | 'it';
 
 export interface TeamMember {
   id: string;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SortKey, TaskWorkPackage, ResponsibleSortOrder, PriorityDefinition } from '../types';
+import type { SortKey, TaskWorkPackage, ResponsibleSortOrder, PriorityDefinition, TeamPreset } from '../types';
 
 interface SetupScreenProps {
   onClose: () => void;
@@ -19,6 +19,8 @@ interface SetupScreenProps {
   onChangeSprintDays: (days: number) => void;
   responsibleSortOrder: ResponsibleSortOrder;
   onChangeResponsibleSortOrder: (order: ResponsibleSortOrder) => void;
+  teamPreset: TeamPreset;
+  onChangeTeamPreset: (preset: TeamPreset) => void;
   priorities: PriorityDefinition[];
   onChangePriorities: (priorities: PriorityDefinition[]) => void;
   onResetSettings: () => void;
@@ -60,7 +62,7 @@ const ToggleSwitch: React.FC<{
       <button
         key={option.value}
         onClick={() => onChange(option.value)}
-        className={`w-full px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+        className={`w-full px-3 py-1 text-sm font-semibold rounded-md transition-all ${
           currentValue === option.value
             ? 'bg-[var(--color-main)] text-white shadow'
             : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
@@ -107,7 +109,7 @@ const ConfirmationDialog: React.FC<{ title: string; message: string; onConfirm: 
 };
 
 
-export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, onRenameKanbanColumn, allTasks, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays, responsibleSortOrder, onChangeResponsibleSortOrder, priorities, onChangePriorities, onResetSettings }) => {
+export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme, onChangeTheme, currentLang, onChangeLang, kanbanColumns, onChangeKanbanColumns, onDeleteKanbanColumn, onRenameKanbanColumn, allTasks, defaultKanbanSort, onChangeDefaultKanbanSort, sprintDays, onChangeSprintDays, responsibleSortOrder, onChangeResponsibleSortOrder, teamPreset, onChangeTeamPreset, priorities, onChangePriorities, onResetSettings }) => {
   const { t } = useTranslation();
   const [newColumnName, setNewColumnName] = useState('');
   const [activeTab, setActiveTab] = useState<SetupTab>('general');
@@ -357,6 +359,21 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onClose, currentTheme,
           case 'kanban':
               return (
                   <div className="space-y-6">
+                      <div>
+                          <h3 className="text-md font-semibold text-[var(--color-text-primary)] mb-2">{t('management')}</h3>
+                          <div className="bg-[var(--color-surface-2)] rounded-lg px-4">
+                              <SettingRow label={t('teamProfile')}>
+                                  <ToggleSwitch
+                                      options={[
+                                          { label: t('analysts'), value: 'analysts' },
+                                          { label: t('informationTechnology'), value: 'it' }
+                                      ]}
+                                      currentValue={teamPreset}
+                                      onChange={(v) => onChangeTeamPreset(v as TeamPreset)}
+                                  />
+                              </SettingRow>
+                          </div>
+                      </div>
                       <div>
                           <h3 className="text-md font-semibold text-[var(--color-text-primary)] mb-2">{t('kanbanColumns')}</h3>
                           <div className="bg-[var(--color-surface-2)] rounded-lg p-3 space-y-3">

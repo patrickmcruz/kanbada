@@ -7,7 +7,7 @@ import { SetupScreen } from './components/SetupScreen';
 import { WorkPackageDetailModal } from './components/WorkPackageDetailModal';
 import { useWorkload } from './hooks/useWorkload';
 import { TEAM_MEMBERS } from './data/team';
-import type { ViewLevel, TaskWorkPackage, AppView, SortKey, ResponsibleSortOrder, PriorityDefinition } from './types';
+import type { ViewLevel, TaskWorkPackage, AppView, SortKey, ResponsibleSortOrder, PriorityDefinition, TeamPreset } from './types';
 import i18n from './config/i18n';
 
 interface SelectedWorkPackageInfo {
@@ -22,6 +22,14 @@ const getInitialPriorities = (): PriorityDefinition[] => [
   { key: 'medium', name: i18n.t('medium'), color: '#eab308' },
   { key: 'low', name: i18n.t('low'), color: '#3b82f6' },
 ];
+
+const ANALYSTS_PRESET = {
+  columns: ['backlog', 'sprint', 'doing', 'review', 'done']
+};
+const IT_PRESET = {
+  columns: ['backlog', 'sprint', 'inProgress', 'codeReview', 'testing', 'done', 'review', 'production']
+};
+
 
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -50,13 +58,14 @@ const App: React.FC = () => {
 
   const [viewLevel, setViewLevel] = useState<ViewLevel>('Day');
   const [activeView, setActiveView] = useState<AppView>('Workload');
-  const [kanbanColumns, setKanbanColumns] = useState<string[]>(['backlog', 'sprint', 'toDo', 'doing', 'review', 'done']);
+  const [kanbanColumns, setKanbanColumns] = useState<string[]>(ANALYSTS_PRESET.columns);
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [defaultKanbanSort, setDefaultKanbanSort] = useState<SortKey>('priority');
   const [selectedWorkPackageInfo, setSelectedWorkPackageInfo] = useState<SelectedWorkPackageInfo | null>(null);
   const [sprintDays, setSprintDays] = useState<number>(7);
   const [responsibleSortOrder, setResponsibleSortOrder] = useState<ResponsibleSortOrder>('asc');
+  const [teamPreset, setTeamPreset] = useState<TeamPreset>('analysts');
 
 
   useEffect(() => {
@@ -112,10 +121,23 @@ const App: React.FC = () => {
     return true; // Indicate success
   };
 
+  const handleTeamPresetChange = (preset: TeamPreset) => {
+    setTeamPreset(preset);
+    if (preset === 'analysts') {
+      setKanbanColumns(ANALYSTS_PRESET.columns);
+    } else {
+      setKanbanColumns(IT_PRESET.columns);
+    }
+  };
+
   const handleResetSettings = () => {
     setTheme('dark');
     changeLanguage('pt');
-    setKanbanColumns(['backlog', 'sprint', 'toDo', 'doing', 'review', 'done']);
+    if (teamPreset === 'analysts') {
+      setKanbanColumns(ANALYSTS_PRESET.columns);
+    } else {
+      setKanbanColumns(IT_PRESET.columns);
+    }
     setDefaultKanbanSort('priority');
     setSprintDays(7);
     setResponsibleSortOrder('asc');
@@ -226,6 +248,8 @@ const App: React.FC = () => {
           onChangeSprintDays={setSprintDays}
           responsibleSortOrder={responsibleSortOrder}
           onChangeResponsibleSortOrder={setResponsibleSortOrder}
+          teamPreset={teamPreset}
+          onChangeTeamPreset={handleTeamPresetChange}
           priorities={priorities}
           onChangePriorities={setPriorities}
           onResetSettings={handleResetSettings}
