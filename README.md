@@ -10,7 +10,7 @@ Uma visão de carga de trabalho moderna para visualizar as atividades da equipe.
 
 ## 📑 Tabela de Conteúdos
 
-1.  [📌 Visão Geral](#visão-geral)
+1.  [📌 Visão Geral](#📌visão-geral)
 2.  [✨ Principais Funcionalidades](#principais-funcionalidades)
 3.  [🧰 Stack de Tecnologia](#stack-de-tecnologia)
 4.  [🗂️ Estrutura do Projeto](#estrutura-do-projeto)
@@ -145,9 +145,9 @@ A lógica de negócio e o estado principal da aplicação são centralizados no 
 
 ## 🔨 Créditos
 
- **Criado por:** [Patrick Motin Cruz](https://github.com/patrickcruzutfpr)
- **Pós-graduado:** Estudante de Ciência de Dados na Universidade Tecnológica Federal do Paraná (UTFPR).
- **Desenvolvedor de Software de Aprendizado de Máquina** na Prefeitura Municipal de Curitiba. Tempo integral.
+- **Criado por:** [Patrick Motin Cruz](https://github.com/patrickcruzutfpr)
+- **Pós-graduado:** Estudante de Ciência de Dados na Universidade Tecnológica Federal do Paraná (UTFPR).
+- **Desenvolvedor de Software de Aprendizado de Máquina** na Prefeitura Municipal de Curitiba. Tempo integral.
 
 ## 📞 Suporte
 
