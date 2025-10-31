@@ -42,7 +42,7 @@ const App: React.FC = () => {
     return preset === 'analysts' ? ANALYSTS_PRESET_COLUMNS : IT_PRESET_COLUMNS;
   });
   const [defaultKanbanSort, setDefaultKanbanSort] = useState<SortKey>(() => (localStorage.getItem('defaultKanbanSort') as SortKey) || 'priority');
-  const [sprintDays, setSprintDays] = useState<number>(() => parseInt(localStorage.getItem('sprintDays') || '7', 10));
+  const [sprintDays, setSprintDays] = useState<number>(() => parseInt(localStorage.getItem('sprintDays') || '14', 10));
   const [responsibleSortOrder, setResponsibleSortOrder] = useState<ResponsibleSortOrder>(() => (localStorage.getItem('responsibleSortOrder') as ResponsibleSortOrder) || 'asc');
   const [priorities, setPriorities] = useState<PriorityDefinition[]>(() => {
       const stored = localStorage.getItem('priorities');

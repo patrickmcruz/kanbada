@@ -608,7 +608,7 @@ function settingsReducer(state: Settings, action: Action): Settings {
         return { 
             ...state,
             defaultKanbanSort: 'priority',
-            sprintDays: 7,
+            sprintDays: 14,
             kanbanColumns: preset === 'analysts' ? ANALYSTS_PRESET_COLUMNS : IT_PRESET_COLUMNS,
         };
       }
